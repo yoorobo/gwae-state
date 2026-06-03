@@ -1,28 +1,34 @@
-# RESULT — 폰 접속 주소 재확인
+# RESULT — STATE 갱신: 카드 잘림 해소 반영
 
-검증: 통과 / 주의 1
+검증: 통과 / 미해결 0
 
-## dev server
-- 상태: 실행 중
-- 포트: 5173
-- 바인딩: 0.0.0.0:5173
-- 프로세스: vite --host 0.0.0.0
-- 로컬 응답: http://127.0.0.1:5173/ -> HTTP 200 OK
-- LAN 응답: http://192.168.219.101:5173/ -> HTTP 200 OK
+## 변경 전
+blockers:
+- AWS 키 CSV 보안처리 (정학 직접)
+- 카드 잘림 HIGH 2개 (C4 iPhone SE, C5 question-panel) - 검증 대기
 
-## PC 실제 LAN IP
-- Wi-Fi 인터페이스: wlo1
-- LAN IP: 192.168.219.101
-- 별도 tailscale IP도 있으나 같은 Wi-Fi 폰 접속용 주소는 192.168.219.101
+next_actions:
+1. 카드 잘림 모바일 실기기 최종 검증
+2. 레딧 빌드인퍼블릭 첫 글/댓글 (D+2 검증 시작)
+3. GA4·Formspree A/B 반응 카운트
 
-## 방화벽
-- ufw 서비스: active
-- ufw 상세 규칙: sudo 암호 필요로 확인 불가
-- 해석: 서버와 주소는 맞음. 폰에서 계속 안 열리면 같은 Wi-Fi 여부, AP isolation, 또는 ufw 5173 차단 가능성 확인 필요.
+## 변경 후
+blockers:
+- AWS 키 CSV 보안처리 (정학 직접)
 
-## 정학이 폰에서 칠 정확한 주소
-http://192.168.219.101:5173/
+next_actions:
+1. 레딧 빌드인퍼블릭 첫 글/댓글 (D+2 검증 시작)
+2. GA4·Formspree A/B 반응 카운트
 
-## 코드/STATE
-- 코드 수정 없음
-- STATE 수정 없음
+## 검증
+- 수정 파일: STATE.md만
+- private commit: 0a9d2b6 docs: resolve card-clipping blocker, update next_actions
+- hook 자동 발동: [post-commit] state mirrors synced 확인
+- public mirror commit: 61b9429 mirror: sync state handoff 2026-06-03
+- secret-guard: STATE.md clean, HANDOFF.md clean
+- public raw STATE.md: blockers에서 카드 잘림 제거 및 next_actions 2줄 반환 확인
+- vault 복사본: 00_STATE.md 갱신 확인
+- 4필드 구조 유지: repo_state / runtime_state / blockers / next_actions
+
+비고:
+- 기존 untracked clocon.html, result.md는 이번 작업에서 건드리지 않음.
