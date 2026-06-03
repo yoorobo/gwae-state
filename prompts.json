@@ -1,0 +1,18 @@
+{
+  "categories": [
+    { "id":"session", "label":"세션 진입", "prompts":[
+      { "id":"resume", "title":"GWAE 이어가기 (새 창)", "target":"클로",
+        "body":"GWAE 이어가기. 아래 raw URL 읽고 시작해.\nSTATE: https://raw.githubusercontent.com/yoorobo/gwae-state/main/STATE.md\nHANDOFF: (HANDOFF 생기면 추가)\nnext_actions 맨 위부터, 새로 설명 안 해도 돼." }
+    ]},
+    { "id":"wo", "label":"WO 전달", "prompts":[
+      { "id":"wo-deliver", "title":"WO 실행 명령 (도우/레오)", "target":"도우/레오",
+        "body":"~/다운로드/<파일명>.md 읽고 그대로 실행해. <안전장치> 끝나면 검증 결과 피드에 기록해(안 뜨면 화면 보고)." }
+    ]},
+    { "id":"signal", "label":"작업 신호", "prompts":[
+      { "id":"done",   "title":"작업완료 신호", "target":"클로", "body":"완료" },
+      { "id":"branch", "title":"갈래 시작",     "target":"클로", "body":"갈래" },
+      { "id":"return", "title":"복귀",          "target":"클로", "body":"복귀" },
+      { "id":"park",   "title":"파킹",          "target":"클로", "body":"파킹" }
+    ]}
+  ]
+}
