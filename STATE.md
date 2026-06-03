@@ -2,7 +2,6 @@
 updated: 2026-06-03 KST
 
 ## repo_state
-- commit: 8c88c66 Merge pull request #1 from yoorobo/fix/update-path-refs
 - branch: main / clean
 - GitHub: yoorobo/gwae (SSH, private)
 
