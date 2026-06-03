@@ -1,13 +1,18 @@
-# RESULT — CLOCON 데스크톱 런처
+# RESULT — 파킹 저장 + prompts.json 생성
 
-검증: 통과 / 미해결 0
+검증: 부분 통과 / 미해결 1
 
-- 생성: ~/.local/share/applications/clocon.desktop
-- 원본: bets/gwae/clocon.html 읽기만, 수정 없음
-- 런처 이름: CLOCON
-- 실행 명령: xdg-open으로 clocon.html 열기
-- desktop-file-validate: 통과
-- 앱 목록 등록 근거: 사용자 applications 디렉터리에 clocon.desktop 존재, Name=CLOCON 확인
-- 독 고정 안내: 앱 목록(좌하단 점 9개)에서 CLOCON 검색 → 우클릭 → 즐겨찾기에 추가
+- 파킹 파일: ~/다운로드/2026-06-03_클로콘등록방식.md 및 ~/Downloads/2026-06-03_클로콘등록방식.md 없음
+- 추가 검색: CASHMONTH, 다운로드, Downloads에서 지정 파일명 미발견
+- _vault/brainstorm/_INDEX.md: 파킹 파일이 없어 깨진 링크 방지를 위해 미수정
+- clocon.html: 읽기만 수행, 수정 없음
+- prompts.json: _state-mirror/prompts.json 생성
+- prompts.json 구조: categories=3, prompts=6 (session:resume / wo:wo-deliver / signal:done,branch,return,park)
+- clocon.html PROMPTS와 prompts.json: 6개 프롬프트 내용 일치
+- secret-guard: prompts.json clean
+- public commit: 23247e7 mirror: add prompts.json for clocon registration
+- prompts.json raw URL: https://raw.githubusercontent.com/yoorobo/gwae-state/main/prompts.json
+- public repo 파일: STATE.md / result.md / prompts.json
 
-비고: GNOME 앱 목록에 바로 안 보이면 로그아웃/재로그인 후 다시 검색.
+미해결:
+- 파킹 본문 원본 파일 2026-06-03_클로콘등록방식.md가 다운로드 폴더에 없어 vault 이동과 _INDEX.md 추가를 수행하지 못함.
