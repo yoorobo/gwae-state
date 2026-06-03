@@ -13,10 +13,8 @@ updated: 2026-06-03 KST
 
 ## blockers
 - AWS 키 CSV 보안처리 (정학 직접)
-- 카드 잘림 HIGH 2개 (C4 iPhone SE, C5 question-panel) - 검증 대기
 
 ## next_actions
-1. 카드 잘림 모바일 실기기 최종 검증
-2. 레딧 빌드인퍼블릭 첫 글/댓글 (D+2 검증 시작)
-3. GA4·Formspree A/B 반응 카운트
+1. 레딧 빌드인퍼블릭 첫 글/댓글 (D+2 검증 시작)
+2. GA4·Formspree A/B 반응 카운트
 
