@@ -1,32 +1,25 @@
-# RESULT - 쇼츠 갈래 파킹 처리
+# RESULT - GWAE 마케팅 정리 문서 vault 적재
 
 Recorded: 2026-06-04 KST
 Scope: vault file parking only. STATE.md not touched.
 
 ## 처리 결과
 
-- Main note moved: _vault/brainstorm/2026-06-04_쇼츠자동화플랫폼.md
-- Asset folder created: _vault/brainstorm/2026-06-04_쇼츠_assets/
-- Brainstorm index updated: _vault/brainstorm/_INDEX.md
-
-## 이동된 assets
-
-- _vault/brainstorm/2026-06-04_쇼츠_assets/B급 크리에이터 쇼츠 자동화 플랫폼 MVP 설계.md
-- _vault/brainstorm/2026-06-04_쇼츠_assets/검증요구서_차이_쇼츠플랫폼마일스톤.md
-- _vault/brainstorm/2026-06-04_쇼츠_assets/쇼츠자동화통합플랫폼.png
-- _vault/brainstorm/2026-06-04_쇼츠_assets/쇼츠자동화플랫폼_빌드제안서.docx
-- _vault/brainstorm/2026-06-04_쇼츠_assets/쇼츠자동화플랫폼_빌드제안서.pdf
-- _vault/brainstorm/2026-06-04_쇼츠_assets/쇼츠자동화플랫폼_연구결과보고서.pdf
-- _vault/brainstorm/2026-06-04_쇼츠_assets/연구의뢰서_쇼츠자동화플랫폼_제나.md
-- _vault/brainstorm/2026-06-04_쇼츠_assets/연구의뢰서_쇼츠자동화플랫폼_제나 (1).md
+- Moved: _vault/decisions/GWAE_marketing_concept.md
+- Moved: _vault/decisions/GWAE_milestones_marketing.md
+- Moved: _vault/decisions/GWAE_target_pivot_marketing.md
+- Created/updated: _vault/decisions/_INDEX.md
 
 ## 인덱스 추가
 
-- [[2026-06-04_쇼츠자동화플랫폼]] 결론:90일은 통합플랫폼 수익화 아닌 유료 DFY 파일럿+반자동 루프 검증 / 메인:B급 크리에이터 종단간 쇼츠 자동화·커머스 수익화 플랫폼
+- [[GWAE_marketing_concept]] GWAE=연인이 함께 묻고 증표로 간직하는 디지털 타로 의식 / Debatium $22.7K 시장 증명
+- [[GWAE_milestones_marketing]] 제품 M-A완성→M-B(Bedrock) / 검증=무대는 차렸으나 막 안 올림 / D+2~180 압축사이클
+- [[GWAE_target_pivot_marketing]] 타겟 이직→연애 전환(차이검증) / 개발자채널=신뢰용, 매출은 연인 니치 / CTA≥4%
 
 ## 검증
 
-- Vault target contains main note, _INDEX.md, and 8 asset files.
-- Download source no longer contains the moved main note or asset files; only the now-empty 쇼츠자동화 folder remains.
+- Vault decisions contains all 3 requested files plus _INDEX.md.
+- Download source no longer contains the exact requested filenames.
+- Download source still has the unrequested duplicate (1) copies; left untouched because WO named exact 3 files only.
 - STATE.md status check returned clean/no output.
 - Existing private repo untracked clocon.html and result.md were not touched.
