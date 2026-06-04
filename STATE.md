@@ -1,20 +1,21 @@
 # STATE - GWAE
-updated: 2026-06-03 KST
+updated: 2026-06-05 KST
 
 ## repo_state
 - branch: main / clean
 - GitHub: yoorobo/gwae (SSH, private)
 
 ## runtime_state
-- 본 앱: trycloudflare 임시터널 (세션마다 주소 변동)
-- 페이크도어 A: fascinating-choux-d37ed0.netlify.app (텍스트)
-- 페이크도어 B: superb-kitsune-0ff759.netlify.app (3D 증표)
+- S1 랜딩: fascinating-choux-d37ed0.netlify.app (라이브, 현재관계)
+- S2 재회 랜딩: ~/다운로드/index_s2_reunion.html (준비완료·배포대기)
+- B 랜딩: superb-kitsune-0ff759.netlify.app (3D 증표, C용 보존)
 - 측정: GA4 G-8PPM41DCRS + Formspree mojbzpqz
 
 ## blockers
 - AWS 키 CSV 보안처리 (정학 직접)
 
 ## next_actions
-1. 레딧 빌드인퍼블릭 첫 글/댓글 (D+2 검증 시작)
-2. GA4·Formspree A/B 반응 카운트
+1. 릴스 소재 제작(큐브GIF→6~10초 세로+카피자막)
+2. Meta 인스타 Traffic/LPV ₩10,000×3일
+3. (선택) 네이버 입찰가 사다리 조사
 
