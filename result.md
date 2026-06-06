@@ -1,3 +1,69 @@
+# WO-37 로그아웃 후 이전 결과 화면 잔류 진단 결과
+
+date: 2026-06-07 KST
+agent: 도우
+scope: 진단/보고만, 코드 수정 없음, 코어 불변, 콘솔 에러 원문 수집, 비밀값 미기재
+
+---
+
+## 결론
+
+최유력 원인은 로그아웃 경로가 인증 UI만 갱신하고 결과 화면 상태를 초기화하지 않는 것이다.
+
+`AuthManager.signOut()`은 Firebase signOut만 수행하고, 인증 상태 변경 후 `updateAuthUI(null)`은 로그인 버튼/아바타/`sajuProfile`/사주 수정 버튼만 정리한다. 그러나 `appState`, `divResult`, `currentQuestion`, `cardStep`, `resultCards.visible`, `streamingPanel.visible`, `result-detail-open`, `authGate.visible`, `sajuOverlay`, `_pendingReadingCallback`은 로그아웃 경로에서 정리되지 않는다.
+
+따라서 버튼 라벨은 "로그인"으로 바뀌지만 이전 결과 카드/해석 패널/질문 텍스트가 남을 수 있다. 관측된 "freeze"는 JS 런타임 정지보다 로그아웃 후 세션성 UI 상태 잔류에 가깝다.
+
+## 코드 근거
+
+| 항목 | 확인 내용 | 위치 |
+|---|---|---|
+| 로그아웃 실행 | 로그인 상태에서 인증 버튼 클릭 시 `await AuthManager.signOut()`만 호출한다. 화면 초기화 호출은 없다. | `src/main.js:236-239` |
+| signOut 본체 | `AuthManager.signOut()`은 Firebase `signOut(auth)`만 await한다. | `src/auth/AuthManager.js:31-33` |
+| auth 상태 콜백 | `onAuthStateChanged`는 `_currentUser` 갱신 후 listener만 호출한다. | `src/auth/AuthManager.js:13-16` |
+| 비로그인 UI 갱신 | `updateAuthUI(null)`은 인증 버튼/아바타/label/`sajuProfile`/사주 수정 버튼만 정리한다. | `src/main.js:205-219` |
+| 결과 화면 진입 | 작괘 완료 시 `appState = STATE.RESULT`, 이후 결과 카드와 intro가 표시된다. | `src/main.js:1102-1104`, `src/main.js:1171-1175`, `src/main.js:1269-1301` |
+| 정상 초기화 루틴 | `resetAll()`은 결과/스트림/상세 class/text/환경 게이트 등을 닫지만 로그아웃 경로에서 호출되지 않는다. | `src/main.js:1465-1500` |
+| pending callback | `_pendingReadingCallback`은 로그인/사주/MBTI 게이트에서 설정되지만 로그아웃에서 null 처리되지 않는다. | `src/main.js:83-93`, `src/main.js:274-301`, `src/main.js:1315-1319` |
+
+## 가설 판정
+
+| 가설 | 판정 |
+|---|---|
+| 로그아웃 핸들러의 UI reset 누락 | 확인됨 |
+| `sajuProfile` 또는 `_pendingReadingCallback` 잔류 | `sajuProfile`은 null 처리됨, `_pendingReadingCallback`은 로그아웃에서 미정리 |
+| WO-35 callback/render loop 충돌 | 가능성 있음. 콜백 생명주기에 로그아웃 정리가 포함되지 않음 |
+| logout 클릭 후 콘솔 에러 | 로그인 세션 부재로 실제 logout 클릭 재현 제한. 수집 가능한 red error는 favicon 404뿐 |
+
+## 콘솔 에러 원문
+
+Playwright 접속 대상: `http://localhost:5173`
+
+Playwright 스냅샷에서 인증 버튼은 "로그인" 상태였고, 세션에 로그인 사용자가 없어 "로그아웃" 클릭 경로는 직접 재현하지 못했다.
+
+```text
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/favicon.ico:0
+```
+
+수집 범위에서 auth/logout/undefined/Cannot read 계열 빨간 에러는 관측하지 못했다.
+
+## 수정 방향 제안
+
+- 로그아웃 완료 또는 `updateAuthUI(null)` 경로에서 `authGate`, `sajuOverlay`, `_pendingReadingCallback`, `streamingPanel`, `resultCards`, `result-detail-open`, `streamText`, `streamPhase`를 정리한다.
+- `resetAll()`을 재사용할지, 로그아웃 전용 `resetSessionUiAfterLogout()`을 둘지는 새 질문 흐름 복귀 UX까지 고려해 결정한다.
+- 로그아웃 이후에는 이전 `divResult` 기반 결과 상세 진입이 불가능하도록 card state와 pending callback을 함께 끊는다.
+
+## 검증
+
+- 상세 보고서: `~/다운로드/gwae/wo/0607_37_result_logout_freeze_진단_v1.md`
+- 코드 수정: 없음
+- 코어 diff: 없음
+- secret-guard: PASS
+- push: 1차 반영 후 최종 raw 확인 섹션 갱신 예정
+- raw URL 확인: 최종 커밋 후 확인 예정
+
+---
+
 # WO-36 태그표준 버전 접미사 규칙 반영 결과
 
 date: 2026-06-07 KST
