@@ -67,8 +67,8 @@ scope: 작괘 코어 호출만, 수정 없음, 측정 스크립트 코어 밖 �
 - 코어 diff: 0
 - LLM 호출: 0
 - secret-guard: PASS
-- push: 1차 반영 후 최종 raw 확인 섹션 갱신 예정
-- raw URL 확인: 최종 커밋 후 확인 예정
+- push: PASS (`main` 반영)
+- raw URL 확인: PASS (HTTP 200, `WO-40`, `N: 10,000회`, `하괘 8 = 4560회`, `코어 diff: 0` 확인)
 
 ---
 
