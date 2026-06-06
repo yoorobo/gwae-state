@@ -1,545 +1,87 @@
-# WO-40 작괘 분포 편향 측정 결과
+# WO-41 이름버그 수정(B) + 검증용 해석 픽스처(A) 결과
 
 date: 2026-06-07 KST
-agent: 도우
-scope: 작괘 코어 호출만, 수정 없음, 측정 스크립트 코어 밖 임시 실행, LLM 호출 0, 비밀값 미기재
+agent: 레오
+source: WO #40 분포측정 + 차이 판정1(B→A→실측→C)
+scope: interpretationLookup.js id 기준 정합, validationRecords 추가, AP-2 코어 불변, LLM 0, 비밀값 미기재
 
 ---
 
-## 측정 경로
+## B — 룩업 id 기준 정합 (이름버그 수정)
 
-- 실제 앱 경로: `computeAdr017Cast({ environment, rotationTotals, stillMs })` -> `computeDivinationFromNumbers(cast)`
-- 확인 위치: `src/main.js:1124-1129`, `src/divination/adr017Adapter.js:102-132`, `src/divination/hexagramEngine.js:40-52`
-- 코어 난수: 없음. ADR-017 작괘 경로는 결정론적이며 입력은 환경값, 회전 누적값, 정지시간이다.
-- N: 10,000회
+### 변경 파일
 
-## 분포 요약
+| 파일 | 변경 요약 |
+|------|-----------|
+| `apps/gwae-cube-v0-leo/3DCube_YJH/src/divination/interpretationLookup.js` | 룩업 키를 hexagramName→hexagramId 기준으로 변경, ENGINE_NAME_TO_ID 역매핑 추가 |
 
-- 8x8 괘 매핑 전수 확인: 64개 입력 -> 64개 본괘, 각 1회. 매핑 테이블 자체 편향 없음.
-- 전역 대체 환경 10,000회: 최빈 `지택임` 658회(6.58%, 64괘 균등 기대 대비 4.21x), `지수사` 545회(3.49x), `지산겸` 542회(3.47x).
-- 전역 대체 환경 하괘 분포: 하괘 8 = 4560회(45.60%), 하괘 7 = 2189회(21.89%), 하괘 6 = 1101회(11.01%). 하괘 8 과대 발생 확인.
-- 서울 고정 환경 10,000회: 상괘가 1로 고정되어 8개 본괘만 출현. 최빈 `지천태` 4532회(45.32%, 64괘 균등 기대 대비 29.00x).
-- 동효 분포: 1~6이 1594~1718회 범위로 상대적으로 균등.
+### 변경 내용
 
-## 5수록괘 출현수
+- **LOOKUP 맵 키**: `hexagramName_situationId_temperamentGroup` → `hexagramId_situationId_temperamentGroup`
+- **ENGINE_NAME_TO_ID 맵 신규 추가**: 엔진 nameKo → hexagramId 역매핑. 오버라이드: `'감위수' → 29` (엔진='감위수', DB='중수감' 불일치 해소)
+- **ALL_RECORDS**: 정식 records + validationRecords 통합해 룩업 대상으로
 
-전역 대체 환경 exact lookup 기준:
+### 검증 결과
 
-| ID | DB 괘명 | 횟수 |
-|---:|---|---:|
-| 31 | 택산함 | 41 |
-| 9 | 풍천소축 | 87 |
-| 29 | 중수감 | 0 |
-| 49 | 택화혁 | 41 |
-| 3 | 수뢰둔 | 0 |
-
-서울 고정 환경 exact lookup 기준:
-
-| ID | DB 괘명 | 횟수 |
-|---:|---|---:|
-| 31 | 택산함 | 0 |
-| 9 | 풍천소축 | 676 |
-| 29 | 중수감 | 0 |
-| 49 | 택화혁 | 0 |
-| 3 | 수뢰둔 | 0 |
-
-참고: DB 29번 이름은 `중수감`, 엔진 데이터 이름은 `감위수`라 현재 문자열 exact lookup 기준으로는 hit하지 않는다.
-
-## 가설 판정
-
-| 가설 | 판정 |
-|---|---|
-| A. 난수 소스 편향 | 해당 없음. 코어 작괘 경로에는 난수 호출이 없다. |
-| B. 괘 매핑 편향 | 64괘 lookup 자체는 균등. 다만 ADR-017 입력->하괘 변환에서 하괘 8 쏠림 확인. |
-| C. 표본 부족 착시 | 아님. N=10,000에서도 전역 최빈 4.21x, 고정 환경 최빈 29.00x. |
-| D. 입력 의존 | 확인됨. 같은 환경에서는 상괘가 고정되어 8괘만 나오며, 하괘 8 쏠림과 결합하면 특정 괘 반복이 충분히 발생한다. |
-
-## 결론
-
-편향 있음. 원인은 64괘 데이터 매핑이 아니라 ADR-017 입력 변환 설계다. 특히 환경 기반 상괘 고정과 dominant axis 기반 하괘 8 과대 발생이 결합한다.
-
-코어 수정 필요 여부: 64괘 장기 균등이 제품 요구라면 AP-2 예외 승인 후 코어/ADR-017 변환 설계 수정이 필요하다. 환경·몸짓 물리량 반영이 의도라면 즉시 수정 필수는 아니지만, 현재 쏠림은 육안 체감과 해석 HIT에 영향을 줄 정도로 크다.
-
-## 검증
-
-- 상세 보고서: `~/다운로드/gwae/wo/0607_40_result_작괘분포_측정_v1.md`
-- 코어 수정: 없음
-- 코어 diff: 0
-- LLM 호출: 0
-- secret-guard: PASS
-- push: PASS (`main` 반영)
-- raw URL 확인: PASS (HTTP 200, `WO-40`, `N: 10,000회`, `하괘 8 = 4560회`, `코어 diff: 0` 확인)
+| 항목 | 결과 |
+|------|------|
+| 29번(감위수→중수감) HIT | true |
+| 정식 5괘(31,9,29,49,3) love/woodfire HIT | 모두 true |
+| 코어(hexagramEngine/hexagrams/trigrams) diff | 0 |
 
 ---
 
-# WO-39 교착 해소 규칙 운영문서 신설 결과
+## A — 검증용 해석 픽스처 추가
 
-date: 2026-06-07 KST
-agent: 도우
-scope: 운영규칙 문서 신설, `_operations/_INDEX.md` 갱신, 앱·코어 무관, 비밀값 미기재
+### 변경 파일
 
----
+| 파일 | 변경 요약 |
+|------|-----------|
+| `apps/gwae-cube-v0-leo/3DCube_YJH/src/data/interpretations_v1_30.json` | validationRecords 배열 추가 (6건) |
+| `apps/gwae-cube-v0-leo/3DCube_YJH/src/main.js` | free_reading_view에 validation_only=true 플래그 심어둠 |
 
-## 수행 내용
+### 추가 레코드 (validationRecords)
 
-- 신설 파일: `_operations/0607_04_운영_교착해소규칙_v1.md`
-- 번호: `04` (`_operations` 기존 01~03 다음 일련번호)
-- 버전 접미사: `_v1` 적용
-- NAMECARD: `status=done`, `category=운영`, `number=04`, `date=0607`, `agent=도우`, `source=정학 피드백 2026-06-07`
-- `_operations/_INDEX.md`: `0607_04_운영_교착해소규칙_v1.md — 교착 해소 규칙(클로↔차이) — done` 한 줄 추가
+| key | hexagramId | hexagramName | situationId | temperamentGroup | validationOnly |
+|-----|-----------|--------------|-------------|------------------|----------------|
+| 19_love_woodfire | 19 | 지택임 | love | woodfire | true |
+| 19_love_metalwater | 19 | 지택임 | love | metalwater | true |
+| 7_love_woodfire | 7 | 지수사 | love | woodfire | true |
+| 7_love_metalwater | 7 | 지수사 | love | metalwater | true |
+| 15_love_woodfire | 15 | 지산겸 | love | woodfire | true |
+| 15_love_metalwater | 15 | 지산겸 | love | metalwater | true |
 
-## 문서 요지
+- 정식 30레코드(approved_for_dev) 변경·삭제 없음. 정식 records 배열 길이: 30 (불변)
+- validationRecords 배열은 records 배열과 완전 분리. meta.validationOnly=true 및 status='validation_fixture' 표기.
+- 텍스트: `[검증용] 이 해석은 분포 검증용 임시 텍스트입니다.` 명백한 placeholder.
 
-- 클로=설계·제안, 차이=반론·검증, 정학=최종 승인 게이트의 3단 견제를 유지한다.
-- 클로와 차이는 둘 다 논쟁 당사자이므로, 차이에게 최종 판정을 위임하지 않는다.
-- 교착 시 클로가 우선순위 선택지로 환원하고, 정학이 1/0/2로 종결한다.
-- 그래도 막히면 제3자 중립검증은 제나에게 외부 사실 검증으로 의뢰한다.
+### GA4 측정 오염 방지
 
-## 검증
-
-- 운영규칙 문서 신설: PASS
-- `_INDEX.md` 갱신: PASS
-- 앱·코어 파일 수정: 없음
-- secret-guard: PASS
-- push: PASS (`main` 반영)
-- raw URL 확인: PASS (HTTP 200, 신설 운영규칙 문서·`_INDEX.md`·`result.md` 내용 반영 확인)
+- `main.js` `free_reading_view` 이벤트에 `validation_only: true` 파라미터 추가 (코드 주석: "임시 검증 괘 / 분포 검증용 / GA4 판단 제외")
+- 검증 레코드 조회 시에만 파라미터 활성화 (`record.meta?.validationOnly` 조건)
 
 ---
 
-# WO-37 로그아웃 후 이전 결과 화면 잔류 진단 결과
+## 통과 조건 확인
 
-date: 2026-06-07 KST
-agent: 도우
-scope: 진단/보고만, 코드 수정 없음, 코어 불변, 콘솔 에러 원문 수집, 비밀값 미기재
+| 조건 | 결과 |
+|------|------|
+| B: 29번 포함 5수록괘 hexagramId 기준 HIT | ✅ 모두 true |
+| A: 지택임·지수사·지산겸 woodfire/metalwater 해석 HIT | ✅ 모두 true |
+| 검증용 레코드 validationOnly=true | ✅ |
+| 정식 30레코드와 분리 확인 | ✅ (별도 validationRecords 배열) |
+| GA4 validation_only 플래그 | ✅ |
+| 코어 diff=0 (AP-2) | ✅ hexagramEngine·hexagrams·trigrams 무수정 |
+| LLM 0 | ✅ |
+| C(분포편향) 미수정 | ✅ 파킹 유지 |
+| secret-guard | ✅ pre-commit 통과 |
 
 ---
 
-## 결론
+## 커밋
 
-최유력 원인은 로그아웃 경로가 인증 UI만 갱신하고 결과 화면 상태를 초기화하지 않는 것이다.
-
-`AuthManager.signOut()`은 Firebase signOut만 수행하고, 인증 상태 변경 후 `updateAuthUI(null)`은 로그인 버튼/아바타/`sajuProfile`/사주 수정 버튼만 정리한다. 그러나 `appState`, `divResult`, `currentQuestion`, `cardStep`, `resultCards.visible`, `streamingPanel.visible`, `result-detail-open`, `authGate.visible`, `sajuOverlay`, `_pendingReadingCallback`은 로그아웃 경로에서 정리되지 않는다.
-
-따라서 버튼 라벨은 "로그인"으로 바뀌지만 이전 결과 카드/해석 패널/질문 텍스트가 남을 수 있다. 관측된 "freeze"는 JS 런타임 정지보다 로그아웃 후 세션성 UI 상태 잔류에 가깝다.
-
-## 코드 근거
-
-| 항목 | 확인 내용 | 위치 |
-|---|---|---|
-| 로그아웃 실행 | 로그인 상태에서 인증 버튼 클릭 시 `await AuthManager.signOut()`만 호출한다. 화면 초기화 호출은 없다. | `src/main.js:236-239` |
-| signOut 본체 | `AuthManager.signOut()`은 Firebase `signOut(auth)`만 await한다. | `src/auth/AuthManager.js:31-33` |
-| auth 상태 콜백 | `onAuthStateChanged`는 `_currentUser` 갱신 후 listener만 호출한다. | `src/auth/AuthManager.js:13-16` |
-| 비로그인 UI 갱신 | `updateAuthUI(null)`은 인증 버튼/아바타/label/`sajuProfile`/사주 수정 버튼만 정리한다. | `src/main.js:205-219` |
-| 결과 화면 진입 | 작괘 완료 시 `appState = STATE.RESULT`, 이후 결과 카드와 intro가 표시된다. | `src/main.js:1102-1104`, `src/main.js:1171-1175`, `src/main.js:1269-1301` |
-| 정상 초기화 루틴 | `resetAll()`은 결과/스트림/상세 class/text/환경 게이트 등을 닫지만 로그아웃 경로에서 호출되지 않는다. | `src/main.js:1465-1500` |
-| pending callback | `_pendingReadingCallback`은 로그인/사주/MBTI 게이트에서 설정되지만 로그아웃에서 null 처리되지 않는다. | `src/main.js:83-93`, `src/main.js:274-301`, `src/main.js:1315-1319` |
-
-## 가설 판정
-
-| 가설 | 판정 |
-|---|---|
-| 로그아웃 핸들러의 UI reset 누락 | 확인됨 |
-| `sajuProfile` 또는 `_pendingReadingCallback` 잔류 | `sajuProfile`은 null 처리됨, `_pendingReadingCallback`은 로그아웃에서 미정리 |
-| WO-35 callback/render loop 충돌 | 가능성 있음. 콜백 생명주기에 로그아웃 정리가 포함되지 않음 |
-| logout 클릭 후 콘솔 에러 | 로그인 세션 부재로 실제 logout 클릭 재현 제한. 수집 가능한 red error는 favicon 404뿐 |
-
-## 콘솔 에러 원문
-
-Playwright 접속 대상: `http://localhost:5173`
-
-Playwright 스냅샷에서 인증 버튼은 "로그인" 상태였고, 세션에 로그인 사용자가 없어 "로그아웃" 클릭 경로는 직접 재현하지 못했다.
-
-```text
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/favicon.ico:0
+```
+dfa5ad3 WO-41 이름버그 수정(B) + 검증용 해석 픽스처(A) (레오)
 ```
 
-수집 범위에서 auth/logout/undefined/Cannot read 계열 빨간 에러는 관측하지 못했다.
-
-## 수정 방향 제안
-
-- 로그아웃 완료 또는 `updateAuthUI(null)` 경로에서 `authGate`, `sajuOverlay`, `_pendingReadingCallback`, `streamingPanel`, `resultCards`, `result-detail-open`, `streamText`, `streamPhase`를 정리한다.
-- `resetAll()`을 재사용할지, 로그아웃 전용 `resetSessionUiAfterLogout()`을 둘지는 새 질문 흐름 복귀 UX까지 고려해 결정한다.
-- 로그아웃 이후에는 이전 `divResult` 기반 결과 상세 진입이 불가능하도록 card state와 pending callback을 함께 끊는다.
-
-## 검증
-
-- 상세 보고서: `~/다운로드/gwae/wo/0607_37_result_logout_freeze_진단_v1.md`
-- 코드 수정: 없음
-- 코어 diff: 없음
-- secret-guard: PASS
-- push: PASS (`main` 반영)
-- raw URL 확인: PASS (HTTP 200, `WO-37 로그아웃 후 이전 결과 화면 잔류 진단 결과`, `콘솔 에러 원문` 확인)
-
----
-
-# WO-36 태그표준 버전 접미사 규칙 반영 결과
-
-date: 2026-06-07 KST
-agent: 도우
-scope: 태그표준 문서 수정만, 기존 내용 보존·추가, 앱·코어 무관, 비밀값 미기재
-
----
-
-## 수행 내용
-
-- 대상: `_operations/0606_01_운영_태그표준.md`
-- NAMECARD `date`: `0606` -> `0607`
-- 문서 제목: `NAMECARD v2` -> `NAMECARD v3`
-- 추가 위치: `## 1. 파일명 규칙` 끝, `## 2. 헤더 규칙` 시작 전
-- 추가 소절: `## 1-1. 버전 접미사 규칙 (_vN) — 신규`
-- 로컬 동기본도 동일 반영했고, 미러 문서와 byte-for-byte 일치 확인
-
-## 검증
-
-- 기존 §1~§5 내용 보존: PASS (지시된 date/title 갱신과 §1-1 추가만 반영)
-- secret-guard: PASS (`_operations/0606_01_운영_태그표준.md`, `result.md`)
-- push: PASS (`main` 반영)
-- raw URL 확인: PASS
-  - `_operations/0606_01_운영_태그표준.md`: HTTP 200, `NAMECARD v3`, `버전 접미사 규칙 (_vN)`, `0607_18_기획_SR1무료코어_v2.md` 확인
-  - `result.md`: HTTP 200, `WO-36 태그표준 버전 접미사 규칙 반영 결과` 확인
-
-## 판정
-
-미러 push 및 raw URL 반영 확인 PASS.
-
----
-
-# WO-34 SR-1 구현2 해석 표시 멈춤 버그 진단 결과
-
-date: 2026-06-07 KST
-agent: 도우
-scope: 진단·보고만, 코드 수정 없음, AP-2 코어 불변, 비밀값 미기재
-
----
-
-## 콘솔 에러 원문
-
-Playwright로 `http://localhost:5173` 접속 후 fallback 모드, 위치 권한 부여, 작괘, 결과 카드 클릭까지 진행했다. Playwright 컨텍스트에는 Google 로그인 세션이 없어 로그인 이후 사주 저장 버튼까지는 재현하지 못했다.
-
-```text
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/favicon.ico:0
-```
-
-수집 범위에서 `temperamentMapper`, `interpretationLookup`, `undefined`, `Cannot read` 관련 빨간 에러는 없었다.
-
-## 가설 4개 결과
-
-| 가설 | 결과 | 파일:라인 | 기여도 |
-|---|---|---|---|
-| MBTI 매핑 입력 부재 | 확인됨. 해석 표시 전 `sajuProfile?.mbti`가 없으면 사주 패널을 다시 연다. 하지만 시(hour)가 있으면 저장 시 MBTI를 `null`로 만든다. | `src/main.js:1314-1320`, `src/auth/SajuInputPanel.js:147`, `src/divination/temperamentMapper.js:11-16` | 높음 |
-| 저장 핸들러 중복/재진입 | 확인됨. `onSaved()`가 pending 콜백을 실행한 뒤 무조건 null로 지운다. 콜백 내부가 MBTI 없음으로 자신을 다시 등록해도 직후 삭제될 수 있다. | `src/main.js:83-89`, `src/main.js:1315-1319`, `src/auth/SajuInputPanel.js:155-159` | 높음 |
-| fallback 표시 오류 | 낮음. 미수록괘는 `{ hit:false }` 후 괘명/괘사/summary를 표시하는 분기가 있고 throw 지점이 없다. | `src/divination/interpretationLookup.js:20-22`, `src/main.js:1322-1338` | 낮음 |
-| 콘솔 에러 | 구현2 관련 빨간 에러는 수집되지 않음. 유일한 빨간 에러는 favicon 404로 본 버그와 무관. | `src/auth/SajuInputPanel.js:160-162` | 낮음 |
-
-## 최유력 원인
-
-MBTI 필수 게이트와 사주 저장 UI/콜백 흐름의 불일치.
-
-구현2는 해석 표시 전에 MBTI를 필수로 요구하지만(`src/main.js:1315`), 사주 입력 UI는 시(hour)가 있으면 MBTI를 저장하지 않는다(`src/auth/SajuInputPanel.js:147`). 그래서 시=22 저장 상태에서는 해석 진입 시 계속 사주 패널로 되돌아간다. 또한 `onSaved()`가 콜백 실행 후 `_pendingReadingCallback`을 무조건 null로 지워, 콜백 내부가 다시 등록한 해석 재개 콜백까지 삭제할 수 있다(`src/main.js:88-89`).
-
-## 레오 수정 범위 제안
-
-MBTI 요구 정책과 사주 입력 UX를 일치시키고, `onSaved()`에서 콜백 실행 중 재등록된 `_pendingReadingCallback`을 덮어 지우지 않도록 해석 재개 콜백 생명주기를 정리할 것.
-
----
-
-# 검증 결과 피드 — 운영체계 업로드
-
-날짜: 2026-06-06 KST
-작업지시: ~/다운로드/0606_03_WO_운영체계_업로드.md
-대상: gwae-state/_operations/
-
-## 생성된 폴더·파일 목록
-- _operations/
-- _operations/0606_01_운영_태그표준.md
-- _operations/0606_02_운영_결정종결원칙.md
-- _operations/_INDEX.md
-
-## 내용 보존 검증
-- 0606_01_운영_태그표준.md: 원본과 복사본 cmp PASS
-- 0606_02_운영_결정종결원칙.md: 원본과 복사본 cmp PASS
-- 파일명·NAMECARD 보존: PASS
-
-## secret-guard 결과
-- _operations/0606_01_운영_태그표준.md: clean
-- _operations/0606_02_운영_결정종결원칙.md: clean
-- _operations/_INDEX.md: clean
-
-## commit / push
-- commit: 6f80825 docs: add operations playbook 0606
-- push: main a65abdb..6f80825 완료
-
-## raw URL 접근 확인
-- 200 / 2925 bytes / https://raw.githubusercontent.com/yoorobo/gwae-state/main/_operations/0606_01_운영_태그표준.md
-- 200 / 2000 bytes / https://raw.githubusercontent.com/yoorobo/gwae-state/main/_operations/0606_02_운영_결정종결원칙.md
-- 200 / 128 bytes / https://raw.githubusercontent.com/yoorobo/gwae-state/main/_operations/_INDEX.md
-
-판정: PASS
-
----
-
-날짜: 2026-06-06 KST
-작업지시: ~/다운로드/0606_07_WO_집1폴더뼈대.md
-대상: ~/다운로드/gwae/workflow_book/
-
-## 생성/확인된 폴더 목록
-- 00_INDEX
-- 0A_운영자산
-- 01_raw
-- 02_기획
-- 03_ADR
-- 04_작괘
-- 05_마케팅
-- 06_랜딩
-- 07_광고
-- 08_WO
-- 09_보고서
-
-## 이동 목록
-- GWAE_클로채팅_합본_0606.md -> 01_raw/
-- _archive_원본채팅/ -> 01_raw/
-- GWAE_파이프라인_PM보고서.md -> 00_INDEX/
-- GWAE_검색인덱스_마인드맵가이드.md -> 00_INDEX/
-
-## 01_raw 검증
-- 01_raw/GWAE_클로채팅_합본_0606.md: 2175551 bytes
-- 01_raw/_archive_원본채팅/: Gwae_01_클로.odt ~ Gwae_08_클로.odt 존재
-- 01_raw 정책: 이동만 수행, 수정·삭제 없음
-
-## 특이사항
-- 지시서 제목/목표에는 "폴더 10개"라고 되어 있으나, mkdir 명령에는 11개 폴더가 포함되어 있어 명령 기준 11개를 생성/확인함.
-- 합본 중 GWAE_클로채팅_합본_0606.md가 존재하여 중단 조건에는 걸리지 않음.
-- gwae-state/_operations/ 및 ~/CASHMONTH/bets/gwae/ 미수정.
-
-판정: PASS
-
----
-
-날짜: 2026-06-06 KST
-작업지시: ~/다운로드/0606_08_WO_filescan.md
-대상: ~/CASHMONTH/bets/gwae/, ~/다운로드/gwae/, ~/다운로드/, ~/CASHMONTH/_archive/
-
-## 스캔 결과 파일
-- ~/다운로드/gwae/workflow_book/00_INDEX/0606_파일스캔결과.md
-
-## 발견 총 개수
-- 162개
-
-## 경로별 개수
-- ~/CASHMONTH/bets/gwae: 54개
-- ~/다운로드/gwae: 49개
-- ~/다운로드: 1개
-- ~/CASHMONTH/_archive: 58개
-
-## 검증
-- 스캔 결과 파일: 197 lines
-- 수행 범위: 읽기·목록화 및 지정 결과 파일/로컬 result.md 기록만 수행
-- mv/rm/대상 파일 편집: 수행하지 않음
-- 코드베이스(~/CASHMONTH/bets/gwae/) 내용 변경: 수행하지 않음
-- 참고: git status 상 기존 변경/미추적 항목(STATE.md, .netlify/, clocon.html, result.md)이 관측됐으나 이번 WO에서 편집하지 않음
-
-판정: PASS
-
----
-
-날짜: 2026-06-06 KST
-작업지시: ~/다운로드/0606_09_WO_classify.md
-대상: ~/다운로드/gwae/workflow_book/
-
-## 수행 요약
-- 지정 매핑에 따라 문서 분류 이동 수행
-- 구버전 보관 폴더 생성/확인: ~/다운로드/gwae/workflow_book/01_raw/_archive_구버전
-- rm 수행 없음
-- 목적지 동일 파일명 충돌: 없음
-- 편집: 로컬 result.md 미러 기록 외 대상 파일 내용 편집 없음
-
-## 폴더별 파일 수
-- 02_기획: 12개
-- 03_ADR: 2개
-- 04_작괘: 8개
-- 05_마케팅: 4개
-- 06_랜딩: 4개
-- 07_광고: 6개
-- 08_WO: 15개
-- 0A_운영자산: 1개
-- 01_raw/_archive_구버전: 7개
-
-## 코드베이스 진실원 잔존 확인
-- STATE.md: PASS
-- HANDOFF.md: PASS
-- DECISIONS.md: PASS
-- PROJECT.md: PASS
-- result.md: PASS
-- AGENTS.md: PASS
-- CLAUDE.md: PASS
-- clocon.html: PASS
-- .mcp.json: PASS
-- .claude/: PASS
-- handoff/: PASS
-- 3DCube /: PASS
-- apps/gwae-cube-v0-leo/: PASS
-
-## 누락/건너뜀
-- ~/CASHMONTH/_archive/downloads-misc/GWAE_차이_온보딩브리프_v3.docx: 지시 경로에 없어 건너뜀
-
-판정: PASS
-
----
-
-날짜: 2026-06-06 KST
-작업지시: ~/다운로드/0606_10_WO_pipeline_upload.md
-대상: gwae-state/_operations/0606_03_운영_표준파이프라인.md
-
-## 업로드 결과
-- 입력 파일: ~/다운로드/0606_03_pipeline.md
-- 업로드 파일: _operations/0606_03_운영_표준파이프라인.md
-- _INDEX.md 변경: 기존 #01·#02 유지, #03 항목 1줄 추가
-- secret-guard: clean
-
-## 커밋 / push
-- operations commit: 2a66527 docs: add operations pipeline 0606
-- push: main 88f82a3..2a66527 완료
-
-## raw URL 접근 확인
-- 200 / https://raw.githubusercontent.com/yoorobo/gwae-state/main/_operations/0606_03_운영_표준파이프라인.md
-- _INDEX 항목 수: 3
-
-판정: PASS
-
----
-
-날짜: 2026-06-06 KST
-작업지시: ~/다운로드/0606_23_WO_leo_harness_check.md
-대상: 레오(Claude Code) 환경 — 교차검증 하네스 작동 점검
-
-## 점검 결과
-
-| 점검 항목 | 상태 | 근거 | 비고 |
-|---|---|---|---|
-| Claude Code hooks 등록 여부 | 미작동 | ~/.claude/settings.json 및 프로젝트 settings.json 전부 hooks 섹션 없음 | PostToolUse/PreToolUse 미등록 |
-| codex 플러그인 활성 | 작동(부분) | enabledPlugins에 codex@openai-codex: true | 플러그인 연결만, 자동 트리거 없음 |
-| codex CLI 설치 | 작동 | codex-cli 0.129.0 (@nvm) | approval_policy=never, sandbox=workspace-write |
-| 교차검증 하네스 정의 위치 | 작동 | _constitution/CLAUDE.md (4단계 검증), AGENTS.md (핸드오프), SESSION_BOOTSTRAP.md | 규칙 명시 완비 |
-| pre-commit hook 설치 | 작동 | .git/hooks/pre-commit → _constitution/scripts/verify-task.sh 실행 | 커밋 시 자동 발동 |
-| verify-task.sh 검증 범위 | 부분 | 앱 디렉토리 존재 + package.json 파싱만 수행 | ESLint/Vitest 미실행, 앱 없으면 skip |
-| secret-guard.sh | 부분 | 스크립트 존재(_state-mirror/secret-guard.sh), 작동 정상 | pre-push git hook 미연결 (sample만 존재) |
-| codex 자동 트리거 | 미작동 | Claude Code hooks 없으므로 코드 편집 시 codex 미호출 | 수동 Skill(codex:*) 호출만 가능 |
-
-## 실작동 테스트 결과
-
-더미 파일 1줄 커밋 시도:
-```
-🔒 pre-commit hook: 검증 시작...
-🔍 GWAE verify-task 시작...
-✅ GWAE verify 완료
-```
-- pre-commit hook 정상 발동 확인
-- 더미 파일: _dummy_test_leo.md (커밋 후 즉시 git revert로 원복 완료)
-
-## 결론
-
-**교차검증은 수동.** Claude Code(레오) 레벨에서 hooks가 없어 codex 기반 자동 검증은 발동하지 않는다.
-codex는 플러그인으로 설치돼 있으나, Skill(codex:*)로 수동 호출해야 작동한다.
-
-pre-commit hook(→ verify-task.sh)은 자동 작동하나 검증 범위가 최소(앱 디렉토리 유무)에 그친다.
-secret-guard.sh는 push 전 수동 실행 필요 — pre-push hook 미연결.
-
-## 미작동 항목 원인 추정
-
-- **Claude Code hooks 없음**: settings.json에 hooks 섹션 자체 미작성. codex 자동 교차검증을 원한다면 PostToolUse hook에 codex 호출 등록 필요.
-- **secret-guard.sh pre-push 미연결**: .git/hooks/pre-push 파일 없음. 수동 실행은 가능하나 push 차단 안 됨.
-- **verify-task.sh 범위 축소**: 앱 디렉토리 없으면 exit 0 (건너뜀). 현 앱 경로(apps/gwae-cube-v0-leo/3DCube_YJH) 기준 하드코딩.
-
-판정: PASS (점검 완료)
-
----
-
-날짜: 2026-06-06 KST
-작업지시: ~/다운로드/gwae/wo/0606_22_WO_도우_SR1검증기준작성.md
-실제 입력 파일: ~/다운로드/0606_22_WO_dow_verification.md
-대상 산출물: ~/다운로드/gwae/wo/0606_23_WO_SR1검증기준.md
-
-## 수행 요약
-- SR-1 무료 코어 구현 전 검증기준 문서 작성 완료
-- 형식: SR 항목 | 검증 방법 | 통과 조건 | 자동/수동 표
-- 코드 변경 없음
-- 작괘 코어 변경 없음
-
-## 검증기준 항목 수
-- 총 26개
-- AP-1~AP-4: 4개
-- SR-1.1~SR-6.3: 22개
-
-## AP-1~4 검증 명령 포함 여부
-- AP-1 무료 Bedrock 0회: 포함
-- AP-2 작괘 코어 불변 및 기존 9개 단위테스트 유지: 포함
-- AP-3 조합 상한 64×3×4=768 및 개별 사주 해석 생성 부재: 포함
-- AP-4 무료 질문 1일 1회 및 daily_limit_block 이벤트: 포함
-
-## 미해결/모호 항목
-- 원문 SR-1 #18에는 SR-4.4/4.5가 없고, WO-22에만 "찌르는한줄 포함", "80:20 노출비율"이 있어 WO-추가 검증항목으로 문서화함
-- AP-2의 9개 단위테스트 기준 파일은 현재 ~/다운로드/gwae/workflow_book/04_작괘/cast.test.ts이며, 구현 레포 이식 시 동일 테스트명 또는 매핑표 필요
-- AP-3의 정확히 768 판정은 풀셋 사전생성 DB 배포 기준이며, 샘플 DB 단계에서는 768 이하와 누락 목록을 별도 판정해야 함
-
-판정: PASS
-
----
-
-날짜: 2026-06-06 KST
-작업지시: ~/다운로드/gwae/wo/0606_24_WO_도우_secretguard연결.md
-실제 입력 파일: ~/다운로드/0606_24_WO_dow_secretguard.md
-대상: gwae-state/result.md, gwae-state local pre-push hook
-
-## 수행 요약
-- secret-guard.sh를 local `.git/hooks/pre-push`에 연결
-- verify-task.sh 수정 없음
-- codex hook 추가/수정 없음
-- sync-result.sh, sync.sh 미수정
-- 앱 코드 및 작괘 코어 미수정
-
-## 검증
-- pre-push hook 실행권한: PASS
-- 더미 발동 테스트: `git push --dry-run origin main`에서 secret-guard 실행 확인
-- result.md 절대경로 정리 건수: 3건
-- result.md 절대경로 잔존: 0건
-- secret-guard result.md 검사: PASS
-
-## push
-- 이번 push는 pre-push secret-guard 통과 후 진행
-- 작업 커밋 해시: 763c623edba817d4ddbedc6812fc1ae04b692327
-
-판정: PASS
-
----
-
-날짜: 2026-06-06 KST
-작업지시: WO — STATE/HANDOFF 갱신 (도우)
-입력 파일: ~/다운로드/0606_26_HANDOFF.md
-대상: gwae-state/STATE.md, gwae-state/HANDOFF.md
-
-## 수행 요약
-- HANDOFF.md 최신 섹션 추가: 0606 저녁 세션 도달점(SR-1 구현 직전) 반영
-- STATE.md 현재위치 갱신: SR-1 구현 직전 (수익화 모델 확정, 해석DB 30 확정)
-- STATE.md next_actions 1번 교체: 레오 SR-1 구현 WO 작성
-- 기존 릴스/Meta 실행은 parked로 보존
-- 작괘 코어·앱 코드 미수정
-
-## 산출물 동기화
-- ~/다운로드/0606_26_HANDOFF.md -> workflow_book/0A_운영자산/
-- 0606 #14, #16~#20, #22~#24 문서 -> NAMECARD dest 기준 보관
-- interpretations_v1_30 approved_for_dev 대표본 -> workflow_book/04_작괘/interpretations_v1_30.json
-- #15, #21, #25 파일은 현재 다운로드에서 미발견
-
-## 검증
-- HANDOFF.md raw URL 반영: PASS (https://raw.githubusercontent.com/yoorobo/gwae-state/main/HANDOFF.md)
-- STATE.md raw URL 반영: PASS (https://raw.githubusercontent.com/yoorobo/gwae-state/main/STATE.md)
-- STATE next_actions 맨 위: "레오 SR-1 구현 WO 작성 (해석DB 30레코드 approved_for_dev, fallback 포함)" 확인
-- 확인용 판정: 새 세션에서 "GWAE 이어가기" 시 다음 행동은 레오 SR-1 구현 WO 작성으로 읽힘
-- secret-guard: STATE.md/HANDOFF.md/result.md clean
-- 절대경로 잔존: 없음
-
-## commit / push
-- 작업 커밋: c92d67eb202a1a4c7b81a3411e7904ec8ac367c4
-- 이번 result.md 기록은 secret-guard pre-push 통과 후 push 진행
-
-판정: PASS
+push: `yoorobo/gwae` main 반영 완료
