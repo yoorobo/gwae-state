@@ -18,12 +18,15 @@ scope: 태그표준 문서 수정만, 기존 내용 보존·추가, 앱·코어 
 ## 검증
 
 - 기존 §1~§5 내용 보존: PASS (지시된 date/title 갱신과 §1-1 추가만 반영)
-- secret-guard: push 전 실행 예정
-- raw URL 확인: push 후 200 및 `NAMECARD v3`, `버전 접미사 규칙 (_vN)` 반영 여부 확인 예정
+- secret-guard: PASS (`_operations/0606_01_운영_태그표준.md`, `result.md`)
+- push: PASS (`main` 반영)
+- raw URL 확인: PASS
+  - `_operations/0606_01_운영_태그표준.md`: HTTP 200, `NAMECARD v3`, `버전 접미사 규칙 (_vN)`, `0607_18_기획_SR1무료코어_v2.md` 확인
+  - `result.md`: HTTP 200, `WO-36 태그표준 버전 접미사 규칙 반영 결과` 확인
 
 ## 판정
 
-미러 push 전 로컬 반영 PASS.
+미러 push 및 raw URL 반영 확인 PASS.
 
 ---
 
