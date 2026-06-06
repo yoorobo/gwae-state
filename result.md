@@ -34,6 +34,33 @@
 ---
 
 날짜: 2026-06-06 KST
+작업지시: ~/다운로드/gwae/wo/0606_24_WO_도우_secretguard연결.md
+실제 입력 파일: ~/다운로드/0606_24_WO_dow_secretguard.md
+대상: gwae-state/result.md, gwae-state local pre-push hook
+
+## 수행 요약
+- secret-guard.sh를 local `.git/hooks/pre-push`에 연결
+- verify-task.sh 수정 없음
+- codex hook 추가/수정 없음
+- sync-result.sh, sync.sh 미수정
+- 앱 코드 및 작괘 코어 미수정
+
+## 검증
+- pre-push hook 실행권한: PASS
+- 더미 발동 테스트: `git push --dry-run origin main`에서 secret-guard 실행 확인
+- result.md 절대경로 정리 건수: 3건
+- result.md 절대경로 잔존: 0건
+- secret-guard result.md 검사: PASS
+
+## push
+- 이번 push는 pre-push secret-guard 통과 후 진행
+- 작업 커밋 해시: 커밋 후 확인
+
+판정: PASS
+
+---
+
+날짜: 2026-06-06 KST
 작업지시: ~/다운로드/0606_07_WO_집1폴더뼈대.md
 대상: ~/다운로드/gwae/workflow_book/
 
@@ -75,7 +102,7 @@
 대상: ~/CASHMONTH/bets/gwae/, ~/다운로드/gwae/, ~/다운로드/, ~/CASHMONTH/_archive/
 
 ## 스캔 결과 파일
-- /home/yoo/다운로드/gwae/workflow_book/00_INDEX/0606_파일스캔결과.md
+- ~/다운로드/gwae/workflow_book/00_INDEX/0606_파일스캔결과.md
 
 ## 발견 총 개수
 - 162개
@@ -135,7 +162,7 @@
 - apps/gwae-cube-v0-leo/: PASS
 
 ## 누락/건너뜀
-- /home/yoo/CASHMONTH/_archive/downloads-misc/GWAE_차이_온보딩브리프_v3.docx: 지시 경로에 없어 건너뜀
+- ~/CASHMONTH/_archive/downloads-misc/GWAE_차이_온보딩브리프_v3.docx: 지시 경로에 없어 건너뜀
 
 판정: PASS
 
@@ -146,7 +173,7 @@
 대상: gwae-state/_operations/0606_03_운영_표준파이프라인.md
 
 ## 업로드 결과
-- 입력 파일: /home/yoo/다운로드/0606_03_pipeline.md
+- 입력 파일: ~/다운로드/0606_03_pipeline.md
 - 업로드 파일: _operations/0606_03_운영_표준파이프라인.md
 - _INDEX.md 변경: 기존 #01·#02 유지, #03 항목 1줄 추가
 - secret-guard: clean
