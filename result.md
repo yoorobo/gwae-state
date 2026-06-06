@@ -31,35 +31,6 @@
 
 판정: PASS
 
----
-
-날짜: 2026-06-06 KST
-작업지시: ~/다운로드/gwae/wo/0606_24_WO_도우_secretguard연결.md
-실제 입력 파일: ~/다운로드/0606_24_WO_dow_secretguard.md
-대상: gwae-state/result.md, gwae-state local pre-push hook
-
-## 수행 요약
-- secret-guard.sh를 local `.git/hooks/pre-push`에 연결
-- verify-task.sh 수정 없음
-- codex hook 추가/수정 없음
-- sync-result.sh, sync.sh 미수정
-- 앱 코드 및 작괘 코어 미수정
-
-## 검증
-- pre-push hook 실행권한: PASS
-- 더미 발동 테스트: `git push --dry-run origin main`에서 secret-guard 실행 확인
-- result.md 절대경로 정리 건수: 3건
-- result.md 절대경로 잔존: 0건
-- secret-guard result.md 검사: PASS
-
-## push
-- 이번 push는 pre-push secret-guard 통과 후 진행
-- 작업 커밋 해시: 763c623edba817d4ddbedc6812fc1ae04b692327
-
-판정: PASS
-
----
-
 날짜: 2026-06-06 KST
 작업지시: ~/다운로드/0606_07_WO_집1폴더뼈대.md
 대상: ~/다운로드/gwae/workflow_book/
@@ -262,5 +233,32 @@ secret-guard.sh는 push 전 수동 실행 필요 — pre-push hook 미연결.
 - 원문 SR-1 #18에는 SR-4.4/4.5가 없고, WO-22에만 "찌르는한줄 포함", "80:20 노출비율"이 있어 WO-추가 검증항목으로 문서화함
 - AP-2의 9개 단위테스트 기준 파일은 현재 ~/다운로드/gwae/workflow_book/04_작괘/cast.test.ts이며, 구현 레포 이식 시 동일 테스트명 또는 매핑표 필요
 - AP-3의 정확히 768 판정은 풀셋 사전생성 DB 배포 기준이며, 샘플 DB 단계에서는 768 이하와 누락 목록을 별도 판정해야 함
+
+판정: PASS
+
+---
+
+날짜: 2026-06-06 KST
+작업지시: ~/다운로드/gwae/wo/0606_24_WO_도우_secretguard연결.md
+실제 입력 파일: ~/다운로드/0606_24_WO_dow_secretguard.md
+대상: gwae-state/result.md, gwae-state local pre-push hook
+
+## 수행 요약
+- secret-guard.sh를 local `.git/hooks/pre-push`에 연결
+- verify-task.sh 수정 없음
+- codex hook 추가/수정 없음
+- sync-result.sh, sync.sh 미수정
+- 앱 코드 및 작괘 코어 미수정
+
+## 검증
+- pre-push hook 실행권한: PASS
+- 더미 발동 테스트: `git push --dry-run origin main`에서 secret-guard 실행 확인
+- result.md 절대경로 정리 건수: 3건
+- result.md 절대경로 잔존: 0건
+- secret-guard result.md 검사: PASS
+
+## push
+- 이번 push는 pre-push secret-guard 통과 후 진행
+- 작업 커밋 해시: 763c623edba817d4ddbedc6812fc1ae04b692327
 
 판정: PASS
