@@ -1,3 +1,42 @@
+# WO-34 SR-1 구현2 해석 표시 멈춤 버그 진단 결과
+
+date: 2026-06-07 KST
+agent: 도우
+scope: 진단·보고만, 코드 수정 없음, AP-2 코어 불변, 비밀값 미기재
+
+---
+
+## 콘솔 에러 원문
+
+Playwright로 `http://localhost:5173` 접속 후 fallback 모드, 위치 권한 부여, 작괘, 결과 카드 클릭까지 진행했다. Playwright 컨텍스트에는 Google 로그인 세션이 없어 로그인 이후 사주 저장 버튼까지는 재현하지 못했다.
+
+```text
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/favicon.ico:0
+```
+
+수집 범위에서 `temperamentMapper`, `interpretationLookup`, `undefined`, `Cannot read` 관련 빨간 에러는 없었다.
+
+## 가설 4개 결과
+
+| 가설 | 결과 | 파일:라인 | 기여도 |
+|---|---|---|---|
+| MBTI 매핑 입력 부재 | 확인됨. 해석 표시 전 `sajuProfile?.mbti`가 없으면 사주 패널을 다시 연다. 하지만 시(hour)가 있으면 저장 시 MBTI를 `null`로 만든다. | `src/main.js:1314-1320`, `src/auth/SajuInputPanel.js:147`, `src/divination/temperamentMapper.js:11-16` | 높음 |
+| 저장 핸들러 중복/재진입 | 확인됨. `onSaved()`가 pending 콜백을 실행한 뒤 무조건 null로 지운다. 콜백 내부가 MBTI 없음으로 자신을 다시 등록해도 직후 삭제될 수 있다. | `src/main.js:83-89`, `src/main.js:1315-1319`, `src/auth/SajuInputPanel.js:155-159` | 높음 |
+| fallback 표시 오류 | 낮음. 미수록괘는 `{ hit:false }` 후 괘명/괘사/summary를 표시하는 분기가 있고 throw 지점이 없다. | `src/divination/interpretationLookup.js:20-22`, `src/main.js:1322-1338` | 낮음 |
+| 콘솔 에러 | 구현2 관련 빨간 에러는 수집되지 않음. 유일한 빨간 에러는 favicon 404로 본 버그와 무관. | `src/auth/SajuInputPanel.js:160-162` | 낮음 |
+
+## 최유력 원인
+
+MBTI 필수 게이트와 사주 저장 UI/콜백 흐름의 불일치.
+
+구현2는 해석 표시 전에 MBTI를 필수로 요구하지만(`src/main.js:1315`), 사주 입력 UI는 시(hour)가 있으면 MBTI를 저장하지 않는다(`src/auth/SajuInputPanel.js:147`). 그래서 시=22 저장 상태에서는 해석 진입 시 계속 사주 패널로 되돌아간다. 또한 `onSaved()`가 콜백 실행 후 `_pendingReadingCallback`을 무조건 null로 지워, 콜백 내부가 다시 등록한 해석 재개 콜백까지 삭제할 수 있다(`src/main.js:88-89`).
+
+## 레오 수정 범위 제안
+
+MBTI 요구 정책과 사주 입력 UX를 일치시키고, `onSaved()`에서 콜백 실행 중 재등록된 `_pendingReadingCallback`을 덮어 지우지 않도록 해석 재개 콜백 생명주기를 정리할 것.
+
+---
+
 # 검증 결과 피드 — 운영체계 업로드
 
 날짜: 2026-06-06 KST
