@@ -27,8 +27,8 @@ scope: 운영규칙 문서 신설, `_operations/_INDEX.md` 갱신, 앱·코어 �
 - `_INDEX.md` 갱신: PASS
 - 앱·코어 파일 수정: 없음
 - secret-guard: PASS
-- push: 1차 반영 후 최종 raw 확인 섹션 갱신 예정
-- raw URL 확인: 최종 커밋 후 확인 예정
+- push: PASS (`main` 반영)
+- raw URL 확인: PASS (HTTP 200, 신설 운영규칙 문서·`_INDEX.md`·`result.md` 내용 반영 확인)
 
 ---
 
