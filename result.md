@@ -59,8 +59,8 @@ Playwright 스냅샷에서 인증 버튼은 "로그인" 상태였고, 세션에 
 - 코드 수정: 없음
 - 코어 diff: 없음
 - secret-guard: PASS
-- push: 1차 반영 후 최종 raw 확인 섹션 갱신 예정
-- raw URL 확인: 최종 커밋 후 확인 예정
+- push: PASS (`main` 반영)
+- raw URL 확인: PASS (HTTP 200, `WO-37 로그아웃 후 이전 결과 화면 잔류 진단 결과`, `콘솔 에러 원문` 확인)
 
 ---
 
