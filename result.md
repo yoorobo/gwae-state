@@ -1,58 +1,38 @@
-# RESULT - S2 재회 랜딩 복제
+# GWAE 채팅 합본 검증 결과
 
-Recorded: 2026-06-04 KST
-Scope: S2 standalone landing only. S1, B landing, casting core, and STATE.md were not edited.
+날짜: 2026-06-06 KST
+합본 파일: ~/다운로드/gwae/workflow_book/GWAE_전체대화_맥락순_합본_0606.md
 
-## 산출물
+## 확정 순서
+04 → 01 → 03 → 02 → 05 → 06 → 07 → 08
 
-- Created S2 source: _archive/downloads-misc/Cash_month/index_s2_reunion.html
-- Copied deploy-ready file: ~/다운로드/index_s2_reunion.html
-- Prepared Clo report file: ~/다운로드/REPORT_클로_S2재회랜딩복제.md
-- S2 sha256: 1a4491460a4e7a21b6fa4a8854ed4900d1fbf071d7ce5e32d9dcc1dea1abd8f1
-- Download copy sha256 matched S2 source.
+## 파일별 판단 근거
+- 1. Gwae_04_클로.odt: 초기 딥리서치/3dcube 참조 요청으로 시작하고 5/28→5/29→5/30 날짜가 진행됨.
+- 2. Gwae_01_클로.odt: 세션 인수인계서 이후 ADR-014→015→016→017, P0~P4 및 M-A 무료 경험 완성으로 이어짐.
+- 3. Gwae_03_클로.odt: 5/31 인수인계로 시작해 페이크도어·레딧·3%룰·git/운영 체계 논의까지 이어짐. 단, Gwae_02와 6/1 인프라 흐름이 파일 단위로 겹쳐 상대 순서 일부 불확실.
+- 4. Gwae_02_클로.odt: 시작 문구가 GitHub 연결(private repo) 이후 단계와 일치하고 로컬 대청소/다운로드 정리 완료까지 다룸. 단, Gwae_03 내부 인수인계 흐름과 시간대가 겹쳐 파일 단위 상대 순서 일부 불확실.
+- 5. Gwae_05_클로.odt: 기존 클로채팅 4개 변환/분석으로 시작하고 STATE/HANDOFF 운영 체계와 카드 잘림 PASS 정리까지 진행됨.
+- 6. Gwae_06_클로.odt: STATE/HANDOFF raw URL로 시작해 카드 잘림 캐시 정정, S랜딩/네이버 예상클릭0, 인스타 릴스 전환 handoff로 끝남.
+- 7. Gwae_07_클로.odt: 네이버→인스타 릴스 전환 이후 reel_v4 제작/게시 설정을 진행하고 전화번호 인증만 남긴 handoff로 종료됨.
+- 8. Gwae_08_클로.odt: 전화번호 인증 handoff로 시작해 광고 계정 인증 시도 이후 0606 집행, GA4/랜딩/PM 보고서 점검으로 이어짐.
 
-## 반영 내용
+## 글자 수 검증
+- 원본 글자 수 총합: 1063791
+- 합본 본문 글자 수: 1063791
+- 결과: 일치
+- 본문 정확 매칭: PASS
+- 포함 파일 수: 8/8
+- 누락: 0
+- 불확실 파일: Gwae_03_클로.odt, Gwae_02_클로.odt
 
-- Hero: 다시 이어질 가능성을 묻고 싶다면
-- Description: 정답을 약속하지 않습니다. 헤어진 관계를 다른 각도에서 보는 64괘 주역 해석입니다. 타로·사주가 아니라, 주역의 관점으로 지금 질문을 돌아봅니다.
-- GA4 experiment: GWAE-S2-reunion
-- Formspree payload landing: S2_reunion
-- Reunion-specific situation options added: reunion_after_breakup, contact_again
-- Existing S1 price honesty, price panel, digital card auxiliary block, Formspree, GA4, and UTM capture kept.
+## 파일별 글자 수
+- Gwae_04_클로.odt: 111011자, 문단 2174개, exact_body_match=True
+- Gwae_01_클로.odt: 132841자, 문단 2999개, exact_body_match=True
+- Gwae_03_클로.odt: 334387자, 문단 6437개, exact_body_match=True
+- Gwae_02_클로.odt: 10816자, 문단 217개, exact_body_match=True
+- Gwae_05_클로.odt: 160949자, 문단 2664개, exact_body_match=True
+- Gwae_06_클로.odt: 137531자, 문단 2359개, exact_body_match=True
+- Gwae_07_클로.odt: 120983자, 문단 3252개, exact_body_match=True
+- Gwae_08_클로.odt: 55273자, 문단 1105개, exact_body_match=True
 
-## 금지선 확인
-
-- S1 hash unchanged: 8fbc404ef492defc618d3f13fbb76465798942a6329c38e7aedce275d5301d10
-- B landing hash unchanged: d9c9a5374cadb112e7f2751f3ee228adceac4e70c23e9cb7708e3e5fc230e2f5
-- STATE.md and casting-core status check returned clean/no output.
-- No forbidden promise copy found for: 무조건, 재회 성공, 돌아옵니다, 상대가 돌아.
-- No 3D card, widget, payment, Bedrock, or 30-minute promise was implemented.
-- Existing private untracked clocon.html and result.md were not touched.
-
-## 도우 검증
-
-- Desktop local browser title passed: GWAE · 재회의 괘를 묻다.
-- Desktop page showed S2 Hero, 64괘/타로·사주 clarification, price note, and reunion situation options.
-- CTA click fired cta_click and revealed price panel plus artifact panel below price.
-- GA4 artifact_section_view fired with placement=below_price_panel.
-- GA4 artifact_preference_select fired with artifact_preference=digital_card.
-- Test Formspree submission returned 200 with ok=true.
-- Formspree request body included landing=S2_reunion, experiment=GWAE-S2-reunion-manual-beta, situation_type=reunion_after_breakup, price_reaction=acceptable, artifact_preference=digital_card, and UTM fields.
-- GA4 beta_submit fired with situation_type=reunion_after_breakup, price_reaction=acceptable, artifact_preference=digital_card.
-- Mobile viewport 375x667 checked after fix: required S2 text present, price panel shown, artifact panel shown, no horizontal overflow. Screenshot captured: gwae-s2-reunion-mobile-afterfix.png.
-
-## Netlify 상태
-
-- Deploy-ready HTML is prepared for manual Netlify Drop as ~/다운로드/index_s2_reunion.html.
-- No existing S1/B deployment was touched.
-- No new Netlify URL was created in this session because deployment was not requested to be executed with site credentials.
-
-## 최종 판정
-
-- S 핵심 메시지 유지: PASS
-- Card block only below price screen: PASS
-- Card/widget preference Formspree submit: PASS
-- GA4 events: PASS
-- Formspree acceptance and payload: PASS
-- Mobile screen: PASS
-- Deploy-ready file for Netlify Drop: PASS
+판정: PASS
