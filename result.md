@@ -164,6 +164,52 @@
 ---
 
 날짜: 2026-06-06 KST
+작업지시: ~/다운로드/0606_23_WO_leo_harness_check.md
+대상: 레오(Claude Code) 환경 — 교차검증 하네스 작동 점검
+
+## 점검 결과
+
+| 점검 항목 | 상태 | 근거 | 비고 |
+|---|---|---|---|
+| Claude Code hooks 등록 여부 | 미작동 | ~/.claude/settings.json 및 프로젝트 settings.json 전부 hooks 섹션 없음 | PostToolUse/PreToolUse 미등록 |
+| codex 플러그인 활성 | 작동(부분) | enabledPlugins에 codex@openai-codex: true | 플러그인 연결만, 자동 트리거 없음 |
+| codex CLI 설치 | 작동 | codex-cli 0.129.0 (@nvm) | approval_policy=never, sandbox=workspace-write |
+| 교차검증 하네스 정의 위치 | 작동 | _constitution/CLAUDE.md (4단계 검증), AGENTS.md (핸드오프), SESSION_BOOTSTRAP.md | 규칙 명시 완비 |
+| pre-commit hook 설치 | 작동 | .git/hooks/pre-commit → _constitution/scripts/verify-task.sh 실행 | 커밋 시 자동 발동 |
+| verify-task.sh 검증 범위 | 부분 | 앱 디렉토리 존재 + package.json 파싱만 수행 | ESLint/Vitest 미실행, 앱 없으면 skip |
+| secret-guard.sh | 부분 | 스크립트 존재(_state-mirror/secret-guard.sh), 작동 정상 | pre-push git hook 미연결 (sample만 존재) |
+| codex 자동 트리거 | 미작동 | Claude Code hooks 없으므로 코드 편집 시 codex 미호출 | 수동 Skill(codex:*) 호출만 가능 |
+
+## 실작동 테스트 결과
+
+더미 파일 1줄 커밋 시도:
+```
+🔒 pre-commit hook: 검증 시작...
+🔍 GWAE verify-task 시작...
+✅ GWAE verify 완료
+```
+- pre-commit hook 정상 발동 확인
+- 더미 파일: _dummy_test_leo.md (커밋 후 즉시 git revert로 원복 완료)
+
+## 결론
+
+**교차검증은 수동.** Claude Code(레오) 레벨에서 hooks가 없어 codex 기반 자동 검증은 발동하지 않는다.
+codex는 플러그인으로 설치돼 있으나, Skill(codex:*)로 수동 호출해야 작동한다.
+
+pre-commit hook(→ verify-task.sh)은 자동 작동하나 검증 범위가 최소(앱 디렉토리 유무)에 그친다.
+secret-guard.sh는 push 전 수동 실행 필요 — pre-push hook 미연결.
+
+## 미작동 항목 원인 추정
+
+- **Claude Code hooks 없음**: settings.json에 hooks 섹션 자체 미작성. codex 자동 교차검증을 원한다면 PostToolUse hook에 codex 호출 등록 필요.
+- **secret-guard.sh pre-push 미연결**: .git/hooks/pre-push 파일 없음. 수동 실행은 가능하나 push 차단 안 됨.
+- **verify-task.sh 범위 축소**: 앱 디렉토리 없으면 exit 0 (건너뜀). 현 앱 경로(apps/gwae-cube-v0-leo/3DCube_YJH) 기준 하드코딩.
+
+판정: PASS (점검 완료)
+
+---
+
+날짜: 2026-06-06 KST
 작업지시: ~/다운로드/gwae/wo/0606_22_WO_도우_SR1검증기준작성.md
 실제 입력 파일: ~/다운로드/0606_22_WO_dow_verification.md
 대상 산출물: ~/다운로드/gwae/wo/0606_23_WO_SR1검증기준.md
