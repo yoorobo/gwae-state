@@ -49,8 +49,8 @@ scope: 진단/보고만, 코드 수정 없음, 코어 불변, og:image·share핸
 - 코어 diff: 0
 - 비밀값 기재: 없음
 - secret-guard: PASS
-- push: 1차 반영 후 최종 raw 확인 섹션 갱신 예정
-- raw URL 확인: 최종 커밋 후 확인 예정
+- push: PASS (`main` 반영)
+- raw URL 확인: PASS (HTTP 200, `WO-46`, `og:image 값: 없음`, `shareData = { text: shareText }`, `결과별 고유 URL 기능: 없음/미구현` 확인)
 
 ---
 
