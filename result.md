@@ -1,6 +1,88 @@
 ---NAMECARD
 status: done
 category: 보고서
+number: 58
+date: 0607
+agent: 도우
+source: 0607_58_WO_dow_feedback_save_cta_diagnose_v1
+dest: ~/다운로드/gwae/wo/
+---
+
+# WO-58 피드백 저장 실패 + 대화팩 CTA 존재 진단
+
+date: 2026-06-07 KST
+agent: 도우
+scope: 진단/보고만. 앱 코드 수정 없음. 커밋 없음. 코어 불변. LLM 0. 비밀값/내부 절대경로 미기재.
+
+## 한 줄 결론
+
+저장실패 원인 = 규칙 가능성이 가장 높음. 피드백 저장 경로는 `users/{uid}/feedback/{readingId}` 서브컬렉션인데, 앱 저장소에는 Firestore rules 파일이 없고 #56 결과에도 해당 서브컬렉션 규칙 추가가 필요하다고 기록되어 있다. 대화팩 CTA = 없음. 프로덕션 HTML/JS와 로컬 코드 모두 `dialogue_pack_cta_click`/대화팩 CTA 구현이 없고, 기존 `payment_attempted` 핸들러만 남아 있다.
+
+## 저장 경로
+
+| 구분 | 확인 결과 |
+|---|---|
+| 자동 저장 | `FeedbackManager.saveAuto(uid, readingId, auto)` -> `users/{uid}/feedback/{readingId}` |
+| 설문 저장 | `FeedbackManager.saveSurvey(uid, readingId, survey)` -> 동일 문서 `setDoc(..., merge:true)` |
+| 행동 저장 | `FeedbackManager.saveAction(uid, readingId, eventName)` -> 동일 문서 `actions` merge |
+| 보상 | `grantReward(uid)` -> `users/{uid}` 단일 문서 transaction |
+
+## Firestore 규칙 현황
+
+| 항목 | 판정 |
+|---|---|
+| 앱 저장소의 `firestore.rules`/`firebase.json` | 없음 |
+| 앱 코드의 저장 경로 | 서브컬렉션 `users/{uid}/feedback/{readingId}` |
+| 기존 히스토리/사주 저장 경로 | `users/{uid}` 단일 문서 |
+| #56 기록 | 피드백 서브컬렉션 규칙 추가 필요하다고 명시 |
+| 배포 rules 원문 직접 조회 | 불가. 현재 환경에 Firebase CLI/gcloud가 없고 rules 파일도 소스 관리되어 있지 않음 |
+
+Firestore rules는 하위 컬렉션에 자동 상속되지 않는다. `match /users/{userId}`가 있어도 `users/{uid}/feedback/{readingId}`에는 별도 match가 필요하다. 따라서 기존 `users/{uid}` write 규칙만 배포된 상태라면 피드백 저장은 `permission-denied`가 난다.
+
+## 저장 실패 원인 판정
+
+최종 판정: **규칙 문제 가능성이 가장 높음.**
+
+- 20자 이상 여부는 보상 조건일 뿐, `saveSurvey` 자체는 20자 미만도 저장하도록 되어 있다.
+- 설문 제출 실패 메시지는 `saveSurvey`의 `setDoc` 예외에서만 표시된다.
+- `grantReward`는 `saveSurvey` 성공 이후 실행되므로, 현재 문구는 보상 트랜잭션 실패보다 피드백 문서 write 실패를 가리킨다.
+- 저장 경로가 기존 단일 문서(`users/{uid}`)가 아니라 신규 서브컬렉션이다.
+- 코드상 uid/rid는 제출 전에 가드된다. 인증 누락/readingId 누락이면 실패 메시지가 아니라 아무 동작 없음에 가깝다.
+- 배포 번들에도 피드백 저장 코드와 실패 문구가 존재하므로, 코드 미배포는 아님.
+
+## 대화팩 CTA 존재 여부
+
+최종 판정: **대화팩 CTA 없음.**
+
+- 로컬 `index.html`에는 `#cta-btn` CSS만 있고 `id="cta-btn"` 버튼 DOM은 없다.
+- 로컬 `src/main.js`에는 `ctaBtn?.addEventListener('click', ...)`와 `payment_attempted` 이벤트만 있다.
+- 프로덕션 HTML에도 `#cosmos-actions`는 `share-btn`, `new-question-btn`만 있다.
+- 프로덕션 JS 번들 검색 결과 `dialogue_pack_cta_click`: 없음, `대화팩`: 없음, `payment_attempted`: 있음.
+- WO-57 결과 기록은 "피드백 UX + 원문보기 토글 + UI 가독성" 반영이며, 대화팩 페이크도어 CTA 반영 기록이 없다.
+
+미표시 원인: 렌더 조건 문제가 아니라 DOM 자체가 없다. CSS와 JS 핸들러 잔재만 있고 버튼이 렌더 트리에 존재하지 않는다.
+
+## 레오 수정 범위 제안
+
+실행은 정학 승인 후.
+
+1. Firestore rules에 `match /users/{userId}/feedback/{readingId}`를 추가하고, `request.auth != null && request.auth.uid == userId` 조건으로 create/update/write 허용.
+2. rules 파일을 저장소에 명시적으로 두고 배포 절차에 포함한다.
+3. 대화팩 CTA는 결과 화면의 실제 DOM에 버튼을 추가하고, 이벤트명을 `dialogue_pack_cta_click`으로 별도 추적한다.
+4. 기존 `payment_attempted` 잔재를 유지할지, 대화팩 CTA로 대체할지 별도 결정한다.
+
+## 미러
+
+- result.md 기록 대상: `gwae-state/result.md`
+- push 대상: `yoorobo/gwae-state` main
+- push: 실행 예정
+- raw URL 확인: 실행 예정
+
+---
+
+---NAMECARD
+status: done
+category: 보고서
 number: 54
 date: 0607
 agent: 도우
