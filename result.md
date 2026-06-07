@@ -1,6 +1,106 @@
 ---NAMECARD
 status: done
 category: 보고서
+number: 60
+date: 0607
+agent: 도우
+source: 0607_60_WO_dow_safety_filter_scan_v1
+dest: ~/다운로드/gwae/wo/
+---
+
+# WO-60 안전필터 전수스캔 결과
+
+date: 2026-06-07 KST
+agent: 도우
+scope: 탐지/보고만. 자동삭제·자동수정 없음. 코어 불변. LLM 0. 괘사 원문 raw 제외. 비밀값/내부 절대경로 미기재.
+
+## 한 줄 결론
+
+명백 위반 0건 / 은유 추정 19건. 안전 하한선 통과. 출시 전 즉시 수정 필요 건수는 0건이며, review_needed 22건은 사람 검토용으로만 남긴다.
+
+## 스캔 대상
+
+| 대상 | 레코드 | 필드 | 스캔 필드 |
+|---|---:|---:|---|
+| fallback-v0.1 | 59 | 118 | `summary`, `fallbackShare` |
+| interpretations_v1_30 | 30 | 90 | `body`, `movingLineSummary`, `shareHook` |
+
+상세 수록괘 hexagramId: 3, 9, 29, 31, 49.
+
+제외: 괘사 원문 raw/guaci, name, 코어 데이터, 엔진 코드.
+
+## 필터별 탐지 건수
+
+| 필터 | review_needed | 명백 위반 | 은유 추정 | 완화/도메인문맥 없음 |
+|---|---:|---:|---:|---:|
+| A 미래단정 | 20 | 0 | 19 | 1 |
+| B 상대심리단정 | 1 | 0 | 0 | 1 |
+| C 전문조언 | 1 | 0 | 0 | 1 |
+| 합계 | 22 | 0 | 19 | 3 |
+
+스캔 방식: 사전 정의 정규식 기반. A는 금지 단정어와 은유형 예언 패턴을 분리했고, B는 상대/그 사람/둘 다 심리·인지 단정 패턴을 탐지했다. C는 의료·법률·재무 키워드를 탐지하되, `손절` 단독처럼 전문 도메인 문맥이 없는 경우는 review_needed에는 남기고 명백 위반에서는 제외했다.
+
+## 명백 위반
+
+없음.
+
+## 완화/도메인문맥 없음
+
+| # | 괘ID | key | field | 필터 | 은유 | 문장 | 판단 |
+|---:|---:|---|---|---|---|---|---|
+| 1 | 29 | 29_career_woodfire | body | C | N | 포기가 아니라 손절이 필요한 자리다. | `손절` 키워드 탐지. 투자/재무 문맥 없음 |
+| 2 | 31 | 31_love_metalwater | shareHook | A | N | 끌림은 시작의 신호일 뿐, 결말의 약속은 아니다. | `결말의 약속` 탐지. 부정문이라 완화 |
+| 3 | 31 | 31_love_woodfire | body | B | N | 그 사람도 같은 온도인지, 묻지 않으면 모른다. | 상대 심리 패턴 탐지. `인지/모른다` 완화 |
+
+## 은유 추정
+
+| # | 괘ID | key | field | 필터 | 은유 | 문장 |
+|---:|---:|---|---|---|---|---|
+| 1 | 2 | fallback_2 | summary | A | Y | 따라가며 두텁게 쌓는 편이 멀리 간다. |
+| 2 | 3 | 3_love_woodfire | body | A | Y | 한 가닥을 당기면 길이 보인다. |
+| 3 | 4 | fallback_4 | fallbackShare | A | Y | 모른다고 말하는 순간 길이 보인다. |
+| 4 | 4 | fallback_4 | summary | A | Y | 모른다는 걸 인정하고 묻는 데서 길이 열린다. |
+| 5 | 9 | 9_career_metalwater | movingLineSummary | A | Y | 안을 다지면 길이 열린다. |
+| 6 | 10 | fallback_10 | fallbackShare | A | Y | 발을 함부로 놓지 않는 사람이 건넌다. |
+| 7 | 10 | fallback_10 | summary | A | Y | 겁이 없는 사람이 아니라, 발을 함부로 놓지 않는 사람이 건넌다. |
+| 8 | 11 | fallback_11 | fallbackShare | A | Y | 잘 풀릴 때 놓치는 건, 막힘이 아니라 방심이다. |
+| 9 | 11 | fallback_11 | summary | A | Y | 막힌 것이 트이고 통하는 때. |
+| 10 | 11 | fallback_11 | summary | A | Y | 다만 잘 풀릴 때 놓치는 것은 막힘이 아니라 방심이다. |
+| 11 | 17 | fallback_17 | summary | A | Y | 고집을 내려놓고 때와 사람을 따를 때 오히려 길이 풀린다. |
+| 12 | 29 | 29_career_woodfire | movingLineSummary | A | Y | 끊고 나와야 길이 보인다. |
+| 13 | 31 | 31_career_metalwater | movingLineSummary | A | Y | 천천히 봐도 기회는 도망가지 않는 종류다. |
+| 14 | 31 | 31_career_woodfire | body | A | Y | 작게라도 시작한 사람만 다음을 본다. |
+| 15 | 31 | 31_career_woodfire | movingLineSummary | A | Y | 첫 행동이 길을 연다. |
+| 16 | 31 | 31_love_woodfire | movingLineSummary | A | Y | 망설임이 길어지면 신호는 식는다. |
+| 17 | 31 | 31_love_woodfire | movingLineSummary | A | Y | 작은 표현 하나가 다음 장면을 연다. |
+| 18 | 31 | 31_self_metalwater | movingLineSummary | A | Y | 지켜보면 결이 드러난다. |
+| 19 | 31 | 31_self_metalwater | shareHook | A | Y | 지금의 끌림이 진짜 나인지 아닌지는, 시간만 안다. |
+
+## 결론
+
+출시 전 즉시 수정 필요 건수: 0건.
+
+차이 안전 하한선 기준으로는 통과. 은유 추정 19건은 `길이 열린다/멀리 간다/건넌다/풀린다/다음 장면을 연다/시간만 안다` 계열이라 기계 필터상 review_needed에 남겼지만, 현행 가능으로 본다. 완화 후보 3건도 부정문·불확실성 표현·도메인문맥 없음으로 명백 위반에서 제외한다.
+
+## 검증 로그 요약
+
+- JSON 파싱으로 대상 수 확인: fallback 59레코드/118필드, 상세 30레코드/90필드
+- 스캔 필드 제한: fallback `summary`, `fallbackShare`; 상세 `body`, `movingLineSummary`, `shareHook`
+- 괘사 원문 raw/guaci 및 코어 파일 미스캔
+- 정규식 기반 후보 추출, 자동삭제/자동수정 없음
+
+## 미러
+
+- result.md 기록 대상: `gwae-state/result.md`
+- push 대상: `yoorobo/gwae-state` main
+- push: 실행 예정
+- raw URL 확인: 실행 예정
+
+---
+
+---NAMECARD
+status: done
+category: 보고서
 number: 58
 date: 0607
 agent: 도우
