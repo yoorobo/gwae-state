@@ -76,7 +76,7 @@ Firestore rules는 하위 컬렉션에 자동 상속되지 않는다. `match /us
 - result.md 기록 대상: `gwae-state/result.md`
 - push 대상: `yoorobo/gwae-state` main
 - push: PASS (main 반영)
-- raw URL 확인: PASS (HTTP 200, WO-58 본문 확인)
+- raw URL 확인: PASS (commit raw HTTP 200, WO-58 최신 본문 확인; main raw HTTP 200, CDN 지연 관찰)
 
 ---
 
