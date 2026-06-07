@@ -1,6 +1,131 @@
 ---NAMECARD
 status: done
 category: 보고서
+number: 53
+date: 0607
+agent: 도우
+source: 0607_53_WO_dow_dirtydiff_check
+dest: ~/다운로드/gwae/wo/
+---
+
+# WO-53 본 레포 dirty diff 점검 결과
+
+date: 2026-06-07 KST
+agent: 도우
+scope: 점검/보고만. 본 레포 수정·커밋·stash·reset·checkout 없음. LLM 0. 비밀값 원문 기재 없음.
+
+## 한 줄 요약
+
+현재 dirty diff는 문서 대량 삭제 + 독립 casting core 삭제 + Firebase/Auth/사주/MBTI 작업 잔여물 + 로컬 보고/도구 파일이 섞인 상태다. 출시 전 처리 필요: YES.
+
+## 최종 결론
+
+이 dirty diff는 그대로 배포/적재하거나 `git add -A`로 묶으면 안전하지 않다.
+
+가장 큰 위험은 `files/hexagram-table.ts`, `files/cast.ts`, `files/types.ts`, `files/cast.test.ts`, `files/demo.ts`, `files/README.md` 삭제다. 이 묶음은 독립 casting core와 64괘 원문 데이터 레이어를 제거하므로, 커밋되면 AP-2 코어 불변 원칙 위반 소지가 있다.
+
+문서 삭제와 Firebase/Auth 계열 변경은 별도 의사결정으로 나눠 처리해야 한다. 실행은 정학 승인 후.
+
+## HEAD 관계
+
+- HEAD: `2ab081c` / `origin/main` / `WO-45: 공유카드+히스토리 구현 (레오)`
+- staged 변경: 없음
+- 현재 변경: 전부 unstaged 또는 untracked
+- `git diff --check`: PASS
+- `git diff --cached --check`: PASS
+
+## 변경 요약
+
+| 구분 | 개수 | 내용 |
+|---|---:|---|
+| modified tracked | 5 | `.gitignore`, `STATE.md`, `package.json`, `package-lock.json`, `handoff/result.md` |
+| deleted tracked | 21 | 루트 문서/문서 바이너리 15개 + `files/` casting core 6개 |
+| untracked | 8 | Firebase/Auth/Saju/MBTI 파일 6개 + `clocon.html` + 루트 `result.md` |
+| staged | 0 | 없음 |
+
+## 파일별 분류
+
+| 파일/그룹 | 상태 | 분류 | 판단 |
+|---|---|---|---|
+| `.gitignore` | M | 로컬 설정 정리 | `.netlify` ignore 추가. 단독으로는 안전 |
+| `STATE.md` | M | 운영 상태 기록 | 재배포 메모 추가. 단독으로는 문서 변경 |
+| `apps/gwae-cube-v0-leo/3DCube_YJH/package.json` | M | 구현 잔여물 | `firebase` 의존성 추가. Auth/Firestore 코드와 세트로 검토 필요 |
+| `apps/gwae-cube-v0-leo/3DCube_YJH/package-lock.json` | M | 빌드/의존성 산출 | Firebase 하위 패키지 대량 추가, package name 변경 포함. 단독 커밋 금지 |
+| `handoff/result.md` | M | 작업 결과 기록 | WO-12 공유 버튼 수정 보고 추가. 문서성 변경 |
+| 루트 문서/문서 바이너리 15개 | D | 문서 정리/이동 잔여 추정 | 실제 보존 위치 확인 전 삭제 커밋 금지 |
+| `files/README.md` | D | casting core 문서 | 코어 패키지 설명 삭제. 위험 |
+| `files/cast.ts` | D | casting core 로직 | 작괘 순수 함수 삭제. AP-2 위험 |
+| `files/hexagram-table.ts` | D | casting core 데이터 | 64괘 원문/lookup 데이터 삭제. AP-2 위험 |
+| `files/types.ts` | D | casting core 타입 | 데이터/작괘 타입 삭제. AP-2 위험 |
+| `files/cast.test.ts` | D | casting core 테스트 | 64괘 무결성/동효 테스트 삭제. AP-2 위험 |
+| `files/demo.ts` | D | casting core 데모 | 보조 파일 삭제. core 묶음과 함께 위험 |
+| `.env.example` | ?? | 설정 템플릿 | Firebase env 키 이름만 있고 값은 비어 있음 |
+| `src/auth/AuthManager.js` | ?? | 구현 잔여물 | Google OAuth/AuthManager 신규 구현. 검토 필요 |
+| `src/auth/SajuInputPanel.js` | ?? | 구현 잔여물 | 사주/MBTI 입력 UI 신규 구현. 검토 필요 |
+| `src/auth/UserDataManager.js` | ?? | 구현 잔여물 | Firestore users/{uid} 저장/로드 신규 구현. 검토 필요 |
+| `src/auth/firebaseConfig.js` | ?? | 설정 코드 | `import.meta.env` 기반 Firebase config. 값 하드코딩은 확인되지 않음 |
+| `src/divination/temperamentMapper.js` | ?? | 구현 잔여물 | MBTI→기질그룹 결정론 매핑 신규 구현 |
+| `clocon.html` | ?? | 로컬 도구 추정 | CLOCON 복사/목록 HTML 도구. 앱 배포와 무관해 보임 |
+| 루트 `result.md` | ?? | 보고 기록 | 이전 정리/WO-52 보고가 들어 있는 untracked 결과 파일. 절대경로 패턴 포함 |
+
+## 코어 영향 여부
+
+결론: 영향 있음. 출시 전 처리 필요.
+
+- 앱 런타임 코어 후보인 `apps/.../src/divination/hexagramEngine.js`, `apps/.../src/data/hexagrams.js`, `apps/.../src/data/trigrams.js`에는 tracked diff 없음.
+- 그러나 독립 casting core 후보인 `files/hexagram-table.ts`, `files/cast.ts`, `files/types.ts`, `files/cast.test.ts`, `files/demo.ts`, `files/README.md`가 삭제 상태다.
+- 특히 `files/hexagram-table.ts`는 64괘 원문/lookup 데이터 레이어라, 이 삭제가 커밋되면 AP-2 코어 불변 위반 소지가 크다.
+
+## 비밀 노출 여부
+
+원문 값은 기재하지 않는다.
+
+| 대상 | 결과 | 판단 |
+|---|---|---|
+| tracked diff | secret 패턴 없음 | PASS |
+| `.env.example` | Firebase env 키 이름만 존재, 값 비어 있음 | PASS |
+| `firebaseConfig.js` | Firebase 설정 필드명 존재, 값은 env 참조 | 실제 키 리터럴 없음 |
+| 루트 `result.md` | 내부 절대경로 패턴 존재 | 미러/공개 기록에는 그대로 쓰면 안 됨 |
+| AWS key/private key/token/password 패턴 | 발견 없음 | PASS |
+
+## 커밋되면 포함되는 것
+
+- `git commit`만 하면 staged가 없으므로 포함 없음.
+- `git add -A` 후 커밋하면 문서 대량 삭제, `files/` casting core 삭제, Firebase 의존성 변경, untracked Auth/Saju/MBTI/도구/결과 파일이 모두 들어갈 수 있다.
+- 이 경우 코어 삭제와 로컬 결과 파일/도구가 섞여 출시·적재 리스크가 높다.
+
+## 제안
+
+실행은 정학 승인 후.
+
+1. 출시/적재 전에는 이 dirty worktree에서 배포하지 않는다.
+2. `files/` casting core 삭제는 승인 전 커밋 금지. 보존/이동/삭제 의도를 먼저 결정한다.
+3. 문서 대량 삭제는 실제 다운로드/아카이브 보존 위치 확인 후 별도 커밋으로 분리한다.
+4. Firebase/Auth/Saju/MBTI 변경은 기능 WO로 분리해 빌드/런타임 검증 후 커밋 여부를 결정한다.
+5. 루트 `result.md`, `clocon.html`은 배포 대상인지 로컬 산출물인지 결정하고, 필요하면 ignore/이동 정책을 정한다.
+6. 처리 전에는 `git status --short`를 재확인하고, 절대 `git add -A`로 한 번에 묶지 않는다.
+
+## 검증 로그 요약
+
+- `git status --short --untracked-files=all`: 확인
+- `git diff --name-status`: 확인
+- `git diff --staged --name-status`: staged 없음
+- `git diff --stat`: 26 tracked files changed, 1098 insertions, 923 deletions
+- `git diff --check`: PASS
+- `git diff --cached --check`: PASS
+- secret pattern scan: 원문 출력 없이 확인
+
+## 미러
+
+- result.md 기록 대상: `gwae-state/result.md`
+- push 대상: `yoorobo/gwae-state` main
+- raw URL 확인: push 후 확인 예정
+
+---
+
+---NAMECARD
+status: done
+category: 보고서
 number: 52
 date: 0607
 agent: 도우
