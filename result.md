@@ -119,7 +119,8 @@ scope: 점검/보고만. 본 레포 수정·커밋·stash·reset·checkout 없�
 
 - result.md 기록 대상: `gwae-state/result.md`
 - push 대상: `yoorobo/gwae-state` main
-- raw URL 확인: push 후 확인 예정
+- push: PASS (`main` 반영)
+- raw URL 확인: PASS (HTTP 200, `WO-53`, 출시 전 처리 필요 YES 확인)
 
 ---
 
