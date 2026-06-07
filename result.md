@@ -85,7 +85,8 @@ scope: 검증/보고만. LLM 0. 자동필터는 summary/fallbackShare 탐지만 
 
 - result.md 기록 대상: `gwae-state/result.md`
 - push 대상: `yoorobo/gwae-state` main
-- push: `yoorobo/gwae-state` main 반영 예정
+- push: PASS (`9099a4f`, `main` 반영)
+- raw URL 확인: PASS (HTTP 200, `WO-52`, 수용기준 7개 PASS, `review_needed` 확인)
 
 ---
 
