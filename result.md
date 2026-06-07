@@ -1,3 +1,94 @@
+---NAMECARD
+status: done
+category: 보고서
+number: 52
+date: 0607
+agent: 도우
+source: 0607_52_WO_dow_fallback_merge_verify
+dest: ~/다운로드/gwae/wo/
+---
+
+# WO-52 fallback-v0.1 병합검증 결과
+
+date: 2026-06-07 KST
+agent: 도우
+input: `~/다운로드/fallback_v0_1.json`
+scope: 검증/보고만. LLM 0. 자동필터는 summary/fallbackShare 탐지만 수행. 코어 원문/name/guaci 복사 없음.
+
+## 최종 판정
+
+적재 준비 완료. 레오 적재 WO로 인계 가능.
+
+## 수용기준 7개
+
+| # | 기준 | 결과 | 근거 |
+|---|---|---|---|
+| 1 | 1~64 누락 0 | PASS | fallback 59개 + 상세 5괘(3,9,29,31,49) = 64 커버. 누락 없음 |
+| 2 | 중복 0 | PASS | fallback hexagramId 중복 없음 |
+| 3 | 상세 5괘 미덮임 | PASS | fallback records에 3,9,29,31,49 없음. 상세 DB는 각 6조합, 총 30레코드 유지 |
+| 4 | fallback에 name/guaci 없음 | PASS | 레코드 필드 전수 확인: hexagramId, summary, fallbackShare만 존재 |
+| 5 | 코어 diff=0/AP-2 불변 | PASS | 이번 WO 산출/검증 과정에서 hexagram-table.ts, 작괘 코어, 원문 raw 수정 없음. 주의: 작업 시작 전부터 repo 전체에는 별도 dirty diff가 존재함 |
+| 6 | 안전문장 완화 반영 | PASS | 15,26,53 포함 단정형 결과/예언 문장 없음. 53은 문장 반복은 있으나 결과 단정 아님 |
+| 7 | fallback-v0.1 롤백 가능 | PASS | datasetVersion=fallback-v0.1, status=approved_for_dev 메타 존재 |
+
+## 커버리지
+
+- fallback records: 59
+- 상세 5괘: 3, 9, 29, 31, 49
+- 병합 우선순위 검증: 상세 > fallback
+- 전체 커버: 64/64
+- 누락: 없음
+- 중복: 없음
+
+## 상세 5괘 확인
+
+`interpretations_v1_30.json` 정식 records 기준:
+
+| hexagramId | 레코드 수 |
+|---:|---:|
+| 3 | 6 |
+| 9 | 6 |
+| 29 | 6 |
+| 31 | 6 |
+| 49 | 6 |
+
+- 총 30레코드.
+- duplicate key 없음.
+- validationRecords 6건은 정식 records와 별도이며 이번 fallback 병합 대상 아님.
+
+## name/guaci 레이어 분리
+
+- 입력 fallback 레코드에는 `name`, `nameKo`, `nameKr`, `nameHanja`, `nameHz`, `guaci` 없음.
+- 화면 괘명/괘사 원문은 hexagramId로 코어 조회해야 하며, fallback 추론 데이터에 복사하지 않음.
+
+## 자동필터 review_needed
+
+적용 범위: fallback `summary`, `fallbackShare`만. raw guaci/코어 미스캔. 자동삭제/자동수정 없음.
+
+| hexagramId | field | kind | text |
+|---:|---|---|---|
+| 12 | summary | medical_legal_financial_advice | 서로 통하지 않고 막힌 자리. 억지로 뚫기보다, 물러나 때를 고르는 편이 손실을 줄인다. |
+
+메모: "손실" 패턴 탐지로 review_needed에 올렸으나 문맥상 일반 은유/손해 축소 표현으로 보임. 사람 판단 대상.
+
+## 검증
+
+| 항목 | 결과 |
+|---|---|
+| fallback JSON 파싱 | PASS |
+| 상세 DB 파싱 | PASS |
+| secret-guard 대상 보고서 | PASS |
+| LLM 사용 | 0 |
+| 자동삭제/자동수정 | 없음 |
+
+## 미러
+
+- result.md 기록 대상: `gwae-state/result.md`
+- push 대상: `yoorobo/gwae-state` main
+- push: `yoorobo/gwae-state` main 반영 예정
+
+---
+
 # WO-46 공유 동작 진단 결과
 
 date: 2026-06-07 KST
