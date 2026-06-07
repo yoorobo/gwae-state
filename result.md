@@ -1,6 +1,54 @@
 ---NAMECARD
 status: done
 category: 보고서
+number: 61
+date: 0607
+agent: 도우
+source: 0607_61_WO_dow_state_handoff_update_v1
+dest: ~/다운로드/gwae/wo/
+---
+
+# WO-61 STATE/HANDOFF 갱신·미러 push 결과
+
+date: 2026-06-07 KST
+agent: 도우
+scope: STATE/HANDOFF 운영 문서 갱신. 앱·코어 무관. LLM 0. 비밀값/내부 절대경로 미기재.
+
+## 수행 내용
+
+- `STATE.md`를 입력 `STATE_new.md` 내용으로 전체 교체.
+- `HANDOFF.md` 맨 위에 입력 `HANDOFF_add.md` 6/7 블록 삽입.
+- HANDOFF 3세션 롤링 확인: 2026-06-07, 2026-06-05, 2026-06-03.
+- secret-guard 통과 후 `gwae-state` public 미러에 STATE/HANDOFF push.
+
+## 검증
+
+| 항목 | 결과 |
+|---|---|
+| STATE guard | PASS |
+| HANDOFF guard | PASS |
+| STATE raw HTTP | 200 |
+| HANDOFF raw HTTP | 200 |
+| remote main | `a25e675` 반영 |
+| STATE raw 내용 | `updated: 2026-06-07 KST (V0 출시 게이트 통과 — 안전필터 포함 전 차단 해소)` 확인 |
+| HANDOFF raw 내용 | 최상단 `2026-06-07 — 큐브 앱 구현·배포 + V0 출시 게이트 통과` 확인 |
+| HANDOFF 세션 수 | 3개 유지 |
+
+## 앱·코어 영향
+
+없음. 앱 소스·작괘 코어 파일은 건드리지 않았다.
+
+## 미러
+
+- STATE/HANDOFF push: PASS (`gwae-state` main `a25e675`)
+- raw URL 확인: PASS (STATE/HANDOFF 모두 HTTP 200 + 6/7 내용 확인)
+- result.md 기록/push: 실행 예정
+
+---
+
+---NAMECARD
+status: done
+category: 보고서
 number: 60
 date: 0607
 agent: 도우
