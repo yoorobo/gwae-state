@@ -1,6 +1,107 @@
 ---NAMECARD
 status: done
 category: 보고서
+number: 54
+date: 0607
+agent: 도우
+source: 0607_54_WO_dow_core_path_check
+dest: ~/다운로드/gwae/wo/
+---
+
+# WO-54 작괘 코어 실제 참조 경로 확인 결과
+
+date: 2026-06-07 KST
+agent: 도우
+scope: 점검/보고만. 수정/복구/커밋/stash/reset/checkout/삭제 없음. 코어 불변. LLM 0. 비밀값 원문/내부 절대경로 미기재.
+
+## 한 줄 결론
+
+`files/` = 잔재(배포 앱 기준 삭제 안전). 실제 작괘 코어 경로는 `apps/gwae-cube-v0-leo/3DCube_YJH/src/divination/hexagramEngine.js` + `src/data/hexagrams.js` + `src/data/trigrams.js`. 출시 전에는 `files/` 삭제를 다른 dirty diff와 분리해 정학 승인 후 처리한다.
+
+## 실제 배포 앱 import 경로
+
+Vite 앱 진입:
+
+- `apps/gwae-cube-v0-leo/3DCube_YJH/index.html`
+- `<script type="module" src="/src/main.js">`
+- `apps/gwae-cube-v0-leo/3DCube_YJH/package.json`: `npm run build` = `vite build`
+
+작괘 관련 import:
+
+| import 위치 | 참조 경로 | 역할 |
+|---|---|---|
+| `src/main.js` | `./divination/hexagramEngine.js` | 숫자 기반 작괘/효 라인 계산 |
+| `src/main.js` | `./divination/adr017Adapter.js` | 입력값을 ADR-017 결정론 매핑으로 변환 |
+| `src/main.js` | `./data/hexagrams.js` | 64괘 표시/해석 fallback 텍스트 |
+| `src/main.js` | `./divination/interpretationLookup.js` | 상세 DB lookup |
+| `src/divination/hexagramEngine.js` | `../data/trigrams.js` | 팔괘 binary/상하괘 데이터 |
+| `src/divination/hexagramEngine.js` | `../data/hexagrams.js` | 본괘/지괘 lookup |
+| `src/data/hexagrams.js` | `./trigrams.js` | 64괘 key/lookup 계산 |
+
+확인 결과, 앱 import graph 안에 `files/`, `files/cast.ts`, `files/hexagram-table.ts`, `files/types.ts` 참조는 없다.
+
+## 실제 작괘 코어
+
+배포 앱의 실사용 코어는 앱 내부 JS 경로에 있다.
+
+| 파일 | 판단 |
+|---|---|
+| `src/divination/hexagramEngine.js` | 손/환경/숫자 seed에서 N1/N2/N3, 본괘, 지괘, 효 라인을 계산하는 런타임 엔진 |
+| `src/data/trigrams.js` | 팔괘 번호와 binary 정의 |
+| `src/data/hexagrams.js` | 8x8 상하괘 조합으로 64괘를 조회하는 앱 데이터 |
+
+이 3개와 `src/main.js`는 현재 tracked diff가 0이다. 이번 점검에서 코어 파일 수정 없음.
+
+## `files/` 역할 판정
+
+`files/README.md`의 tracked 원문은 `files/`를 "카메라/3D/네트워크 없음", "레오의 큐브 방식과 독립된 병렬 트랙"이라고 설명한다. 즉 `files/`는 초기 산출물 또는 독립 casting-core 후보로 보이며, 현재 배포 앱이 직접 import하는 런타임 코어는 아니다.
+
+저장소 전체 검색에서 `files/hexagram-table.ts`는 과거 handoff/비교 문서의 후보 경로로만 등장했다. 앱 소스와 Vite 진입점에서는 참조되지 않는다.
+
+## 삭제 영향
+
+| 항목 | 판정 | 근거 |
+|---|---|---|
+| 작괘 런타임 영향 | 없음 | `src/main.js` -> `src/divination/hexagramEngine.js` -> `src/data/*`로 닫힘 |
+| Vite 빌드 영향 | `files/` 삭제 자체는 영향 없음 | `package.json` build는 `vite build`, `index.html` 진입점은 `/src/main.js`, import graph에 `files/` 없음 |
+| Netlify deploy 영향 | `files/` 삭제 자체는 영향 없음 | Netlify도 작업트리 기준 Vite 빌드를 수행하므로 import되지 않는 `files/` 삭제로 module resolve 실패가 나지 않음 |
+| 코어 불변 | 유지 | 실사용 앱 코어 3개와 `src/main.js` tracked diff 0, 이번 점검에서 수정 0 |
+
+주의: 실제 `npm run build`는 `dist` 쓰기가 발생하므로 이번 WO의 "읽기/정적분석/import 추적만" 제약에 따라 실행하지 않았다. 위 판정은 Vite 진입점과 import graph 기준이다.
+
+## 결론
+
+`files/`는 현재 배포 앱 기준 실사용 경로가 아니라 잔재다. 따라서 `files/` 삭제는 앱의 빌드/작괘 동작에는 직접 영향이 없고, 배포 앱 관점에서는 삭제 안전으로 판정한다.
+
+다만 `files/`는 독립 casting-core 후보였으므로, 저장소 정책상 삭제를 실제 반영할지는 별도 승인으로 결정해야 한다. 특히 현재 worktree에는 문서 대량 삭제, Firebase/Auth 관련 dirty diff, 로컬 산출물이 섞여 있으므로 `git add -A` 일괄 처리 금지.
+
+## 출시 전 처리 제안
+
+1. `files/` 삭제는 "배포 앱 미사용 잔재 정리"로 별도 승인 후 독립 커밋 처리한다.
+2. 앱 런타임 코어(`src/divination/hexagramEngine.js`, `src/data/hexagrams.js`, `src/data/trigrams.js`)는 그대로 둔다.
+3. 문서 대량 삭제와 Firebase/Auth/Saju/MBTI 변경은 별도 WO/커밋으로 분리한다.
+4. 배포 직전에는 정학 승인 후 깨끗한 작업트리 또는 승인된 변경 세트에서 빌드/Netlify deploy를 수행한다.
+
+## 검증 로그 요약
+
+- `git status --short --branch`: `files/*` 삭제와 기타 dirty diff 확인
+- `rg import`: 앱 import graph 확인
+- `rg files/`: 앱 소스 내 `files/` 참조 없음 확인
+- `git diff` on runtime core: `src/main.js`, `hexagramEngine.js`, `hexagrams.js`, `trigrams.js` diff 0 확인
+- `git show HEAD:files/README.md`: `files/`가 독립 병렬 트랙임을 확인
+
+## 미러
+
+- result.md 기록 대상: `gwae-state/result.md`
+- push 대상: `yoorobo/gwae-state` main
+- push/raw URL 확인: 이 보고서 작성 후 수행
+
+
+---
+
+---NAMECARD
+status: done
+category: 보고서
 number: 53
 date: 0607
 agent: 도우
