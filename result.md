@@ -42,7 +42,7 @@ scope: STATE/HANDOFF 운영 문서 갱신. 앱·코어 무관. LLM 0. 비밀값/
 
 - STATE/HANDOFF push: PASS (`gwae-state` main `a25e675`)
 - raw URL 확인: PASS (STATE/HANDOFF 모두 HTTP 200 + 6/7 내용 확인)
-- result.md 기록/push: PASS (gwae-state main 7174e35)
+- result.md 기록/push: PASS (gwae-state main 반영)
 
 ---
 
