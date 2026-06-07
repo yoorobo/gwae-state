@@ -94,7 +94,8 @@ Vite 앱 진입:
 
 - result.md 기록 대상: `gwae-state/result.md`
 - push 대상: `yoorobo/gwae-state` main
-- push/raw URL 확인: 이 보고서 작성 후 수행
+- push: PASS (`main` 반영)
+- raw URL 확인: PASS (HTTP 200, `WO-54`, `files/` 잔재/삭제 안전, 실제 코어 경로 확인)
 
 
 ---
