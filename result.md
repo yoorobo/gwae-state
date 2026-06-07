@@ -93,8 +93,8 @@ scope: 탐지/보고만. 자동삭제·자동수정 없음. 코어 불변. LLM 0
 
 - result.md 기록 대상: `gwae-state/result.md`
 - push 대상: `yoorobo/gwae-state` main
-- push: 실행 예정
-- raw URL 확인: 실행 예정
+- push: PASS (main 반영)
+- raw URL 확인: PASS (HTTP 200, WO-60 본문 확인)
 
 ---
 
