@@ -1,4 +1,11 @@
 # CASHMONTH 운영체계 인덱스
+
+## 진실원 링크 (클로 fetch용)
+- STATE:   https://raw.githubusercontent.com/yoorobo/gwae-state/main/STATE.md
+- HANDOFF: https://raw.githubusercontent.com/yoorobo/gwae-state/main/HANDOFF.md
+- result:  https://raw.githubusercontent.com/yoorobo/gwae-state/main/result.md
+- operations index: https://raw.githubusercontent.com/yoorobo/gwae-state/main/_operations/_INDEX.md
+
 - 01 태그표준 (NAMECARD v2) — done
 - 02 결정종결원칙 (Decision Closure) — done
 - 0606_03_운영_표준파이프라인.md — CASHMONTH PIPELINE v1 (6게이트 P0~P5) + GWAE 순서 평가
