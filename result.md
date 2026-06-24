@@ -13,7 +13,7 @@
 - WO-73 인앱 OAuth/게스트 작괘 핫픽스 dirty diff를 WO-73 root result.md와 대조 검증.
 - 일치할 때만 private gwae에 commit/push.
 - 재배포 금지 준수: Netlify deploy 실행 없음.
-- 완료 기록: STATE/HANDOFF/handoff/result.md 갱신, mirror 동기화 예정.
+- 완료 기록: STATE/HANDOFF/handoff/result.md 갱신, public mirror 동기화 완료.
 
 ## 1단계 working tree 확인
 
@@ -74,5 +74,5 @@
 ## 다음 에이전트에게
 
 - WO-73 핫픽스는 이제 배포 결과와 git이 연결됐다. 재배포는 하지 않았다.
-- 남은 dirty는 기록 갱신 파일(STATE/HANDOFF/handoff/result.md)뿐이며, untracked `_state-mirror/`, `clocon.html`, `gwae-state/result_v4.md`, `gwae-state/result_v4_hotfix.md`는 이번 WO 범위 밖이다.
+- 최종 private working tree는 tracked dirty 0이며, untracked `_state-mirror/`, `clocon.html`, `gwae-state/result_v4.md`, `gwae-state/result_v4_hotfix.md`는 이번 WO 범위 밖이다.
 - 다음 확인 축은 GA4/Meta 콘솔 사실 확인과 WO-70 Pixel 여부다.
