@@ -78,10 +78,10 @@
 | AP-1 LLM 0 | PASS: Bedrock/LLM 호출 없음 |
 | STATE updated | PASS: `STATE.md` updated가 `2026-06-24 KST`로 변경됨 |
 | private STATE/HANDOFF commit | PASS: `5010cf8 state: resync GWAE progress after 0609`, `24d1899 state: fix resync repo status wording` |
-| public mirror STATE/HANDOFF push | PASS: mirror `d7ea9c1 mirror: sync state handoff operations 2026-06-24`; remote `main` ref도 `d7ea9c1` 확인 |
+| public mirror STATE/HANDOFF push | PASS: mirror `d7ea9c1 mirror: sync state handoff operations 2026-06-24` 확인. 이후 public `main`은 result sync commit으로 전진 |
 | raw STATE/HANDOFF 확인 | PASS: `main/STATE.md`에서 `updated: 2026-06-24 KST`와 최신 repo_state 문구 확인. `main/HANDOFF.md`에서 2026-06-24 최신 블록 확인 |
 | secret-guard | PASS: public `result.md` 동기화 전 `[guard] clean` 확인 |
-| public result sync | PASS: `sync-result.sh` 실행 후 public raw `result.md`에서 본 WO 결과 확인 |
+| public result sync | PASS: `sync-result.sh` 실행 후 원격 `main` ref 전진 확인. pushed commit raw `result.md`에서 최종본 확인. `main/result.md` raw는 검증 중 캐시로 이전 본문을 반환한 적 있음 |
 | Notion 피드 | FAIL: Notion 쓰기 MCP 도구 미노출. Playwright로 피드 URL 접근 시 로그인 화면(`Sign in to see this page`)에서 차단 |
 
 ## 커밋
