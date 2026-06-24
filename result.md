@@ -65,6 +65,12 @@
 - `HANDOFF.md`: 최신 블록의 WO-73 확인 필요 항목을 `5940503` 완료로 정리.
 - 이전 `handoff/result.md`는 `handoff/result_20260624_before_wo73_commit_cleanup.md`로 백업.
 
+## 검증 결과 피드
+
+- Notion 검증 결과 피드 페이지 ID `372f9b98-01ac-8198-98d9-df00187d5479`에 브라우저로 접근했으나 로그인 화면에서 차단됨.
+- Notion 쓰기 MCP/create/update 도구도 세션에 노출되지 않음.
+- 따라서 피드 직접 기록은 실패. 동일 요약은 이 `handoff/result.md`와 public mirror `result.md`에 기록/동기화함.
+
 ## 다음 에이전트에게
 
 - WO-73 핫픽스는 이제 배포 결과와 git이 연결됐다. 재배포는 하지 않았다.
