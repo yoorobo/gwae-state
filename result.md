@@ -67,7 +67,7 @@
 | `STATE.md` | `updated:`를 2026-06-24로 갱신. 6/9 WO-69, GA4 ID hotfix, WO-71, WO-73 result 사실 반영. 광고/성과와 WO-73 commit 연결은 확인 필요로 표기 |
 | `HANDOFF.md` | 최신 블록 `2026-06-24 — 6/9 이후 본업 진행 재동기화 + STATE/HANDOFF 복구` 추가. 3세션 롤링 유지 |
 | `handoff/result.md` | 본 WO 조사/검증 결과 기록 |
-| `result.md` public mirror | 본 WO 결과를 public mirror에 동기화 예정 |
+| `result.md` public mirror | 본 WO 결과를 public mirror에 동기화 |
 
 ## 검증 결과
 
@@ -79,15 +79,17 @@
 | STATE updated | PASS: `STATE.md` updated가 `2026-06-24 KST`로 변경됨 |
 | private STATE/HANDOFF commit | PASS: `5010cf8 state: resync GWAE progress after 0609`, `24d1899 state: fix resync repo status wording` |
 | public mirror STATE/HANDOFF push | PASS: mirror `d7ea9c1 mirror: sync state handoff operations 2026-06-24`; remote `main` ref도 `d7ea9c1` 확인 |
-| raw STATE/HANDOFF 확인 | PARTIAL: commit raw `d7ea9c1/STATE.md`는 최신 문구 확인. `main/STATE.md` raw는 캐시로 이전 repo_state 문구를 반환함. HANDOFF main raw는 최신 2026-06-24 블록 확인 |
-| secret-guard | 예정: public `result.md` 동기화 직전 실행 |
-| Notion 피드 | 확인 필요: 현재 세션에 Notion 쓰기 도구 노출 여부 재확인 필요 |
+| raw STATE/HANDOFF 확인 | PASS: `main/STATE.md`에서 `updated: 2026-06-24 KST`와 최신 repo_state 문구 확인. `main/HANDOFF.md`에서 2026-06-24 최신 블록 확인 |
+| secret-guard | PASS: public `result.md` 동기화 전 `[guard] clean` 확인 |
+| public result sync | PASS: `sync-result.sh` 실행 후 public raw `result.md`에서 본 WO 결과 확인 |
+| Notion 피드 | FAIL: Notion 쓰기 MCP 도구 미노출. Playwright로 피드 URL 접근 시 로그인 화면(`Sign in to see this page`)에서 차단 |
 
 ## 커밋
 - private gwae: `5010cf8 state: resync GWAE progress after 0609`
 - private gwae: `24d1899 state: fix resync repo status wording`
 - public gwae-state: `3d350cc mirror: sync state handoff operations 2026-06-24`
 - public gwae-state: `d7ea9c1 mirror: sync state handoff operations 2026-06-24`
+- public gwae-state: `sync-result.sh`로 public `result.md` push
 
 ## 다음 에이전트에게
 - STATE/HANDOFF는 2026-06-24 기준으로 6/9 이후 본업 진행을 재동기화했다.
