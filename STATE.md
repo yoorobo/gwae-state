@@ -1,39 +1,45 @@
 # STATE - GWAE
-updated: 2026-06-07 KST (V0 출시 게이트 통과 — 안전필터 포함 전 차단 해소)
+updated: 2026-06-24 KST (6/9 이후 본업 진행 재동기화 — git/result 기반)
 
 ## repo_state
-- branch: main / clean (files/ 잔재 삭제 분리커밋 완료)
+- branch: main / origin/main at 26d934d (handoff: record RAW freshness result)
+- working tree: dirty — 앱 파일 3개(index.html, analytics.js, main.js)와 root result.md 수정, local mirror/클로콘/result_v4 계열 untracked 확인. 앱 수정분은 WO-73 결과와 일치하나 git commit 여부는 확인 필요.
 - GitHub: yoorobo/gwae (SSH, private) / 미러: yoorobo/gwae-state (public)
-- 실사용 작괘 코어: src/divination/hexagramEngine.js + src/data/hexagrams.js + src/data/trigrams.js (AP-2 불변)
+- 실사용 작괘 코어: src/divination/hexagramEngine.js + src/data/hexagrams.js + src/data/trigrams.js (AP-2 diff=0 확인)
 
 ## runtime_state
-- **큐브 앱 = 라이브**: https://gwae-cube.netlify.app (Project 41721050-..., 첫 정식 배포)
-  - 작괘(MediaPipe 손동작)→64괘 도출→해석→공유→히스토리→피드백 전부 폰 작동 확인
-  - 64괘 커버리지 완성: 5수록괘 상세(3·9·29·31·49 × situation × temperament) + 59괘 fallback(summary+fallbackShare, fallback-v0.1)
-  - 원문보기 무료 토글(괘사 한자, "괘사 기반 기본 해석" 표기), 피드백 3분할 저장, 보상(개인화해석 3회 서버측 1회), 대화팩 페이크도어 CTA, 정적 OG 카드
-- Firebase: Auth(Google OAuth, 승인도메인 gwae-cube.netlify.app 등록), Firestore users/{uid} + users/{uid}/feedback/{readingId}(규칙 게시 완료)
-- 측정: GA4 G-8PPM41DCRS (이벤트 연결 확인은 출시 전 남은 점검)
-- 랜딩(별개): S1 fascinating-choux(라이브), B superb-kitsune(보존), resplendent-cannoli(정체불명 드롭)
+- **큐브 앱 = 라이브**: https://gwae-cube.netlify.app
+  - 2026-06-09 WO-69(v4): GA4 측정 인프라 + 중앙 sanitizer + 동의배너 + 카메라 온보딩 구현(commit 4cfd84e, Deploy ID 6a27952e1c02541e668c544c).
+  - 2026-06-09 GA4 측정ID 교체: 랜딩용 G-8PPM41DCRS -> 큐브앱 전용 G-YVVF39PZ2E(commit 41ed3f2, Deploy ID 6a279d965e33c7381fe4448d). 현재 코드도 analytics.js/index.html에서 G-YVVF39PZ2E 확인.
+  - 2026-06-09 WO-71: 대화팩 신청완료 후 닫기 버튼 문구 분기(commit 56e9c52, Unique deploy 6a27ad1a13a59e3aa39a4d1e).
+  - 2026-06-10 WO-73 결과: 게스트 작괘 기본화 + 인앱 브라우저 Google OAuth 차단 안내 + 결과 후 로그인 CTA + authState/personalizationMode 측정 파라미터. result.md상 Deploy ID 6a284af632cbdd9d71ff81f3 / Production URL 확인. 해당 앱 파일 변경은 현재 working tree에 미커밋 상태로 남아 있어 commit 반영 여부 확인 필요.
+  - 기존 기능: 작괘(MediaPipe 손동작) -> 64괘 도출 -> 해석 -> 공유 -> 히스토리/피드백. 64괘 커버리지와 fallback 체계는 6/7 상태 유지.
+- Firebase: Auth(Google OAuth, 승인도메인 gwae-cube.netlify.app 등록), Firestore users/{uid} + feedback 경로. 인앱 브라우저 OAuth 403 이슈는 WO-73에서 게스트 통과/외부 브라우저 안내로 우회했다고 result에 기록됨.
+- 측정: GA4 G-YVVF39PZ2E. 표준 이벤트 12개는 WO-69 result 기준 구현. 현재 코드에는 auth_blocked_inapp/external_browser_cta_click 및 cube_cast_start/complete의 authState/personalizationMode 추가가 미커밋 diff로 존재.
+- 광고/캠페인: `gwae_v0_cast_01` 6/9~6/11 집행 여부와 성과 숫자는 로컬 git/result에서 직접 확인되지 않음. 확인 필요(외부 Meta/GA4 콘솔 영역).
+- 랜딩(별개): S1 fascinating-choux(라이브), B superb-kitsune(보존), resplendent-cannoli(정체불명 드롭) — 6/7 STATE 이후 변동 근거 미확인.
 
-## release_gate (SR-V0) — 통과
-- 절대체크 11개 충족: 멈춤버그0·빈화면0·자동필터·version롤백·피드백저장·readingMode·version·64커버리지·fallbackReason·스모크·검증용제거
-- 안전 하한선 통과: 도우 자동필터 전수스캔 명백위반 0건 / 은유추정 19건(review_needed, 출시 안 막음)
-- 코어 AP-2 diff=0, AP-1 LLM 0 유지
+## release_gate (SR-V0) — 통과 후 진행
+- SR-V0 통과 사실은 6/7 기준 유지.
+- 6/9 이후 추가 완료: WO-69 측정 인프라, GA4 ID hotfix, WO-71 대화팩 닫기 문구, WO-73 인앱 OAuth/게스트 작괘 핫픽스(result 기반).
+- 안전장치: AP-2 diff=0, AP-1 LLM 0 확인. sanitizer allowlist는 question/currentQuestion, uid, email, mbti 원문, freeText 등 비허용 필드를 GA4 전송에서 차단하는 구조.
 
 ## blockers
-- AWS 키 CSV 보안처리 (정학 직접, 미해결)
-- 출시 전 GA4 이벤트 실제 수집 확인 (피드백·대화팩·source_toggle)
+- AWS 키 CSV 보안처리 (정학 직접, 미해결 여부 확인 필요)
+- Meta 광고관리자/GA4 콘솔 실제 성과 숫자 확인 필요(도우 로컬 접근 불가)
+- WO-73 앱 수정분이 working tree에 남아 있음. commit/push 기준 최신 배포와 로컬 코드 일치 여부 확인 필요.
 
 ## next_actions
-1. GA4 이벤트 실제 수집 확인 (출시 전 마지막 기술 점검)
-2. V0 출시 = 광고 링크 노출 시작 (인스타 ask.gwae · 페북 캠페인 gwae_s1_v1)
-3. 측정: 작괘·공유·재방문·피드백·대화팩CTA·원문토글 데이터 수집
-4. (병렬) 제나 RFR #48 발주 — 출시 후 무엇부터 고도화할지(5축)
-5. (병렬) 효사384 단일원전 확보 트랙 — 동효 정밀해석 근거 (수요순 고도화)
+1. GA4 콘솔(G-YVVF39PZ2E): Key Event 등록 확인/실행(cube_cast_complete, share_complete).
+2. GA4 콘솔: 커스텀 측정기준 등록 확인/실행(appVersion, castId, readingMode, fallbackReason, temperamentGroup, interpretationVersion, utm_content, authState, personalizationMode).
+3. Meta/GA4 외부 콘솔에서 `gwae_v0_cast_01` 집행 여부·기간·성과 숫자 확인. 로컬 근거 없으므로 확인 필요.
+4. WO-73 핫픽스 working tree 변경분의 commit/push/배포 상태 정리. 이미 배포된 Deploy ID 6a284af632cbdd9d71ff81f3와 git 상태 연결 확인 필요.
+5. WO-70 Pixel은 result_v4/v4_hotfix에서 후속으로 남아 있음. Pixel ID 확보 후 동의·sanitizer 재사용해 추가 여부 결정.
+6. 효사384 단일원전 확보 트랙 — 동효 정밀해석 근거 (수요순 고도화).
 
 ## parked
-- 결제(SR-2): 측정 후. 크레딧 모델→PG→서버검증→Bedrock게이트(AP-1)
-- 대화팩 실기능: 페이크도어 데이터 쌓인 뒤 (V0.1 공감보드→V1 질문카드→V2 대화방)
+- 결제(SR-2): 측정 후. 크레딧 모델 -> PG -> 서버검증 -> Bedrock게이트(AP-1)
+- 대화팩 실기능: 페이크도어 데이터 확인 뒤 (V0.1 공감보드 -> V1 질문카드 -> V2 대화방)
 - 공개 게시판(allowPublicShare 필드만 예약), 고유URL·동적OG
 - 작괘 편향(C)·작괘 시간/엔트로피: 폰 손동작 데이터 측정 후
 - 은유추정 19건 톤: 출시 후 피드백 루프로

@@ -5,6 +5,34 @@
 
 ---
 
+## 2026-06-24 — 6/9 이후 본업 진행 재동기화 + STATE/HANDOFF 복구
+
+### Session Topic
+STATE/HANDOFF가 2026-06-07 상태에서 멈춘 것을 확인하고, 6/8~6/24 사이 git/result/code에 남은 사실만 캐서 진실원을 최신화했다. 조사는 read-only로 진행했고, 쓰기는 STATE/HANDOFF/result에 한정했다.
+
+### Key Facts (git/result 기반)
+- **6/9 WO-69(v4) 측정 인프라**: GA4 실연동, 중앙 sanitizer allowlist, 분석 동의 배너, 카메라 온보딩, 표준 이벤트 12개가 commit 4cfd84e로 반영됨. result_v4 기준 Deploy ID 6a27952e1c02541e668c544c.
+- **6/9 GA4 ID hotfix**: 큐브앱 측정ID가 G-8PPM41DCRS에서 G-YVVF39PZ2E로 교체됨(commit 41ed3f2). result_v4_hotfix 기준 Deploy ID 6a279d965e33c7381fe4448d. 현재 analytics.js/index.html도 G-YVVF39PZ2E.
+- **6/9 WO-71**: 대화팩 신청완료 후 닫기 버튼 문구 분기(commit 56e9c52), result_WO71 기준 unique deploy 6a27ad1a13a59e3aa39a4d1e.
+- **6/10 WO-73 결과**: root result.md에 게스트 작괘 기본화 핫픽스 결과가 기록됨. 인앱 브라우저 OAuth 차단 대응(isInAppBrowser, 외부 브라우저 안내), 게스트 작괘 통과, MBTI 선택화, 게스트 결과 후 로그인 CTA, authState/personalizationMode 측정 파라미터가 포함됨. Deploy ID 6a284af632cbdd9d71ff81f3. 단 해당 앱 변경은 현재 working tree 미커밋 상태로 보여 commit/push 연결은 확인 필요.
+- **6/14 하네스 작업**: _operations mirror, WO 마무리 표준, RAW 최신성 규칙만 갱신했고 본업 STATE는 갱신하지 않았음. 이번 누락의 직접 원인으로 기록.
+
+### 확인 필요
+- `gwae_v0_cast_01` 광고가 2026-06-09 19:00~2026-06-11 19:00 집행 완료됐다는 사실은 WO 배경에는 있으나, 로컬 git/result 검색에서는 직접 근거를 찾지 못함. Meta/GA4 외부 콘솔 확인 필요.
+- WO-73 Deploy ID와 현재 미커밋 앱 diff의 관계 확인 필요. result에는 배포 완료가 적혀 있으나, git에는 WO-73 커밋이 없음.
+- 광고 성과 숫자, GA4 DebugView/Key Event 상태, Meta Pixel ID/WO-70 진행 여부는 로컬에서 확인 불가.
+
+### Open Follow-ups
+- [ ] GA4 G-YVVF39PZ2E Key Event 등록: cube_cast_complete, share_complete.
+- [ ] GA4 커스텀 측정기준 등록: appVersion, castId, readingMode, fallbackReason, temperamentGroup, interpretationVersion, utm_content, authState, personalizationMode.
+- [ ] Meta 광고관리자/GA4 콘솔에서 `gwae_v0_cast_01` 집행 기간·성과 확인.
+- [ ] WO-73 working tree 변경분 commit/push/배포 상태 정리.
+- [ ] WO-70 Pixel: Pixel ID 확보 후 동의·sanitizer 재사용해 추가 여부 결정.
+
+### Context for Next Session
+이제 클로는 6/7 출시 직전 상태가 아니라 6/9 측정 구축과 6/10 인앱 핫픽스까지 반영된 STATE를 읽어야 한다. 다만 광고 성과와 WO-73 git 정리는 아직 외부 콘솔/커밋 확인이 필요하다. 이후 세션은 "광고 후 데이터 판정"으로 가기 전에 GA4/Meta 콘솔 사실과 WO-73 코드 상태를 먼저 닫는 것이 좋다.
+
+
 ## 2026-06-07 — 큐브 앱 구현·배포 + V0 출시 게이트 통과
 
 ### Session Topic
@@ -27,14 +55,13 @@ GWAE 큐브 앱(작괘 본체)을 처음으로 라이브 배포하고, SR-1 구�
 - #38 로그아웃 리셋 / #40 작괘분포 측정(상괘=환경 고정·하괘쏠림, 마우스 특성) / #41 이름버그(id룩업)+검증픽스처 / #43 모바일 레이아웃 / #45 구현3(공유+히스토리) / #46 공유진단 / #50·51 64괘 기본해석 생성 / #52 fallback 적재검증 / #53·54 dirty diff·코어경로 / #55 작업트리정리+fallback적재 / #56 피드백·보상·OG / #57 피드백UX·원문토글·페이크도어 / #58 저장실패·CTA진단 / #59 Firestore규칙·CTA·버튼 / #60 안전필터 전수스캔(위반0)
 
 ### Open Follow-ups
-- [ ] GA4 이벤트 실제 수집 확인 (출시 전 마지막 점검)
-- [ ] V0 출시 = 광고 링크 노출 시작 (인스타·페북)
+- [x] GA4 이벤트 실제 수집 준비: WO-69 측정 인프라와 41ed3f2 ID 교체로 코드 반영. 콘솔 실제 수집 확인은 별도 필요.
+- [ ] V0 광고 집행/성과 확인: 로컬 git/result 근거 없음. Meta/GA4 콘솔 확인 필요.
 - [ ] 제나 RFR #48 발주(출시후 고도화 5축)
 - [ ] 효사384 단일원전 확보
-- [ ] 파일명 _vN 규칙: 클로가 같은 파일명 재출력해 리눅스 (1)(2) 충돌 → 앞으로 파일명에 _vN 박고 명령어에 최신 v 명시 (이번 세션부터 적용)
 
 ### Context for Next Session
-이번 세션에 큐브 앱이 "폰에서 도는 무료 웹앱"으로 완성·배포됐고 출시 직전까지 왔다. 결제·앱스토어는 V0 다음(측정 후). V0의 목적은 기능검증이 아니라 **마케팅·바이럴 시장검증**(광고 링크 노출→작괘·공유·재방문 측정). 이 SR→차이검증→레오/도우 구현→폰검증→배포→측정 흐름 자체가 다음 베팅에 재사용할 파이프라인. 다음 세션은 GA4 확인 → 출시(광고) 단계.
+이번 세션에 큐브 앱이 "폰에서 도는 무료 웹앱"으로 완성·배포됐고 출시 직전까지 왔다. 결제·앱스토어는 V0 다음(측정 후). V0의 목적은 기능검증이 아니라 **마케팅·바이럴 시장검증**(광고 링크 노출→작괘·공유·재방문 측정). 6/24 기준으로는 6/9 측정 인프라와 6/10 WO-73 결과까지 별도 최신화됨.
 
 
 ## 2026-06-05 — 마케팅 채널 전환: 네이버 검색광고 → 인스타 릴스
@@ -57,83 +84,29 @@ S1/S2 랜딩 배포·준비 완료. 네이버 검색광고 키워드를 실데�
 
 ### 현재 자산 상태 (좌표)
 - **S1 랜딩 = 라이브**: https://fascinating-choux-d37ed0.netlify.app
-  (Hero "그 사람과 계속 가도 될까?", 가격 ₩3,900 예정가, 디지털 괘 카드 보조블록,
+  (Hero "그 사람과 계속 가도 될까", 가격 예정가, 디지털 괘 카드 보조블록,
    Formspree 선호문항 해석만/카드/위젯/모름, GA4 6이벤트, UTM 5종)
-- **S2 재회 랜딩 = 준비완료·배포대기**: ~/다운로드/index_s2_reunion.html
-  (sha256 1a4491...abd8f1, GA4 experiment=GWAE-S2-reunion, Formspree landing=S2_reunion)
-  → 채널 전환으로 S2 배포는 당분간 보류(재회 키워드 안 쓰므로). 파일은 안전 보관.
+- **S2 재회 랜딩 = 준비완료·배포대기**: 파일명/sha는 기존 HANDOFF에서만 확인됨. 현재 재확인 필요.
 - **B 랜딩**(3D 증표, superb-kitsune-0ff759) = C용 보존, 미변경
-- 측정: GA4 G-8PPM41DCRS + Formspree mojbzpqz
-- **큐브 영상 자산**: satlas 답글용 GIF 있음(cube_gwae.gif, 8~28초 화면녹화, 600px).
-  → 릴스용으로 재편집 필요(6~10초, 세로 9:16, 첫1초 후킹, 카피자막).
+- 측정: 당시 기준 GA4 G-8PPM41DCRS + Formspree mojbzpqz. 큐브앱은 이후 G-YVVF39PZ2E로 분리됨.
+- **큐브 영상 자산**: satlas 답글용 GIF 있음(cube_gwae.gif, 8~28초 화면녹화, 600px). 릴스용 재편집 필요였음. reel_v5 산출물은 로컬 git/result에서 확인 못 함.
 
 ### 차이 인스타 릴스 파일럿 계획 (다음 실행)
 - 채널: Instagram Reels + Stories
 - 목표: Traffic / 성과목표 Landing Page Views
-- 예산: ₩10,000 × 3일 = ₩30,000 / 랜딩: S1 1개 / 소재: 큐브 영상 1개
-- UTM: utm_source=instagram, utm_medium=paid_social, utm_campaign=gwae_s1_ongoing_v1, utm_content=reel_a
-- 영상 카피: "그 사람과 계속 가도 될까? / 정답 대신, 지금 관계를 다른 각도에서 보는 한 번의 주역 해석." CTA "내 관계 질문 남기기"
+- 예산: 기존 계획상 소액 3일 테스트. 실제 집행 여부·성과는 확인 필요.
+- UTM: 기존 계획에는 instagram/paid_social 캠페인 구조가 있음. 실제 `gwae_v0_cast_01` 값은 로컬 근거 없음.
 - 3일 판정: 세션<30 채널재검토 / 세션30+ CTA0 메시지약함 / CTA있고 신청0 가격·가치약함 / 신청1+ 수동해석 시작 / 신청3+ 추가집행
 
 ### 네이버 잔여 처리 (돈 안 씀)
-- 광고 ON 금지. 입찰가 사다리(₩800/1000/1200/1500/1800)로 재회3개(재회사주/상담/타로) 예상실적만 기록.
-- 보류 규칙: 최저 유효 CPC > ₩1,000 또는 7일 예상클릭 < 30 → 네이버 S2 보류.
+- 광고 ON 금지. 입찰가 사다리로 재회3개 예상실적만 기록.
+- 보류 규칙: 최저 유효 CPC > 1000 또는 7일 예상클릭 < 30 → 네이버 S2 보류.
 - 첫 테스트는 일치검색만(확장검색은 의도 섞임).
 
 ### Open Follow-ups
-- [ ] **릴스 소재 제작** ← 진짜 다음 작업. 큐브 GIF → 6~10초 세로 릴스 + 카피 자막
-- [ ] Meta 광고 관리자: 인스타 계정 연결 → Traffic/LPV 캠페인 → ₩10,000×3일
-- [ ] (선택) 네이버 입찰가 사다리 조사
-- [ ] 수동 해석 운영 준비: 정적 괘 카드 1장 디자인(저장하고싶을 품질, 차이 강조)
-      판정게이트: 카드선택 4/10+ / 카드있으면 결제고려 3/10+ / 실제결제 2건+ → M-B 착수
-- [ ] STATE.md 갱신(현재 미러는 6/3자, 6/4~6/5 마케팅 흐름 미반영)
-- [ ] CLOCON "GWAE 이어가기" 진입프롬프트 수정(HANDOFF URL+캐시버스터+두파일 다 읽기) — 미실행
+- [ ] Meta 광고 관리자/GA4에서 실제 집행·성과 확인.
+- [ ] 릴스 소재 파일(reel_v5 등) 존재 여부 확인 필요. 로컬 git/result에서는 직접 근거 없음.
+- [ ] 수동 해석 운영 준비: 정적 괘 카드 1장 디자인.
 
 ### Context for Next Session
-어제(6/4)~오늘(6/5): satlas 레딧 답글(빌드인퍼블릭 첫발) → 마케팅 문서 vault 적재 →
-차이 검증 여러 바퀴(타겟 S/C분리, 증표 보조강등, 키워드 재선정) → S1 배포 → S2 준비 →
-네이버 키워드 실데이터 "예상 클릭 0" 발견 → 차이 재검증 → 채널을 인스타 릴스로 전환 결정.
-핵심 학습: 네이버 충전 전 "월간 예상 실적"부터 확인해 ₩30,000 헛지출을 막음(검증 우선 원칙의 실효).
-제나·차이 추정이 실데이터와 어긋남을 두 번 확인(키워드 검색량, 예상 클릭) → 실데이터 확인 필수.
-다음은 큐브 영상을 릴스로 만들어 인스타 광고로 첫 유효 트래픽을 확보하는 단계.
-
-
-
-## 2026-06-03 — 솔로파운더 인프라 구축 + 클로콘
-
-### Session Topic
-세션 연속성·환경 자동화 인프라를 하루에 구축. 단일 진실원부터 클로콘 앱까지.
-
-### Key Decisions
-- **단일 진실원**: GWAE 레포(~/CASHMONTH/bets/gwae, private)가 원본. 세 갈래로 흐름 —
-  레오·도우=로컬 직접 / 정학=옵시디언 복사본 / 클로=public raw URL.
-- **STATE/HANDOFF 분리**: STATE=현재 사실(이력0, 거울), HANDOFF=맥락(3세션 롤링). 업계 표준.
-- **public 미러**: private는 클로가 못 읽으니, 비밀 없는 STATE/result/prompts만
-  public 레포(gwae-state)로 미러. 클로가 raw URL로 토큰 없이 읽음.
-- **자동화**: post-commit hook이 STATE/PROJECT/DECISIONS 커밋 시 vault·public 자동 미러.
-- **비밀 게이트**: secret-guard.sh가 push 직전 비밀패턴 검사. STATE·result·prompts 다 통과 필수.
-- **옵시디언**: 심링크가 vault 밖 가리켜 다운 → 복사본+sync-state.sh로 전환(해결).
-- **STATE commit줄 제거(C안)**: git이 이미 commit 보관하니 STATE 본문엔 중복 안 둠.
-- **클로콘(CLOCON)**: 프롬프트 리모컨 앱. 단일 HTML, 데이터 내장(A안, fetch 없음),
-  복사 폴백(clipboard+execCommand). 우분투 독 고정 완료.
-  등록 방식=prompts.json을 public 누적+클로가 HTML 재생성(나 방식). 절차는 클로 메모리 #5.
-
-### Open Follow-ups
-- [ ] raw URL을 클로 메모리에 박기 (새 세션이 STATE 자동 인지) ← 진입 프롬프트 완성용
-- [ ] HANDOFF.md를 레포에 두고 public 미러 (이 파일이 그 첫 산출물)
-- [ ] result.md 자동 미러 — 현재 sync-result.sh 수동. hook에 묶으면 "완료" 한 마디로 끝남
-- [ ] clocon.html을 git에 커밋 (현재 untracked)
-- [ ] 본업(여러 번 미뤄짐): 카드 잘림 HIGH 2개(C4 iPhone SE, C5 question-panel) 모바일 실기기 검증
-      → 레딧 빌드인퍼블릭 D+2 → GA4·Formspree A/B
-
-### Context for Next Session
-오늘은 본업(GWAE 카드 잘림)이 아니라 "인프라+도구"를 종일 깔았다. 이제 새 세션은
-raw URL로 STATE를 읽어 시작할 수 있고(설명 0회), WO는 클로가 파일+채팅 코드블럭으로 주면
-정학이 복붙 한 번으로 도우/레오에게 전달, 결과는 result.md로 받는다. 클로콘으로 반복
-프롬프트는 클릭 복사. 다음은 이 토대 위에서 진짜 본업(카드 잘림 검증)으로 돌아갈 차례.
-
-### 핵심 raw URL (클로 읽기용)
-- STATE:   https://raw.githubusercontent.com/yoorobo/gwae-state/main/STATE.md
-- result:  https://raw.githubusercontent.com/yoorobo/gwae-state/main/result.md
-- prompts: https://raw.githubusercontent.com/yoorobo/gwae-state/main/prompts.json
-- HANDOFF: https://raw.githubusercontent.com/yoorobo/gwae-state/main/HANDOFF.md
+6/5에는 채널 전환과 릴스 파일럿 계획이 핵심이었다. 6/24 재동기화 기준으로는 이후 큐브앱 측정 인프라와 인앱 핫픽스가 반영됐지만, 실제 광고 집행/성과는 외부 콘솔 확인이 필요하다.
