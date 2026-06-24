@@ -14,23 +14,23 @@ STATE/HANDOFF가 2026-06-07 상태에서 멈춘 것을 확인하고, 6/8~6/24 �
 - **6/9 WO-69(v4) 측정 인프라**: GA4 실연동, 중앙 sanitizer allowlist, 분석 동의 배너, 카메라 온보딩, 표준 이벤트 12개가 commit 4cfd84e로 반영됨. result_v4 기준 Deploy ID 6a27952e1c02541e668c544c.
 - **6/9 GA4 ID hotfix**: 큐브앱 측정ID가 G-8PPM41DCRS에서 G-YVVF39PZ2E로 교체됨(commit 41ed3f2). result_v4_hotfix 기준 Deploy ID 6a279d965e33c7381fe4448d. 현재 analytics.js/index.html도 G-YVVF39PZ2E.
 - **6/9 WO-71**: 대화팩 신청완료 후 닫기 버튼 문구 분기(commit 56e9c52), result_WO71 기준 unique deploy 6a27ad1a13a59e3aa39a4d1e.
-- **6/10 WO-73 결과**: root result.md에 게스트 작괘 기본화 핫픽스 결과가 기록됨. 인앱 브라우저 OAuth 차단 대응(isInAppBrowser, 외부 브라우저 안내), 게스트 작괘 통과, MBTI 선택화, 게스트 결과 후 로그인 CTA, authState/personalizationMode 측정 파라미터가 포함됨. Deploy ID 6a284af632cbdd9d71ff81f3. 단 해당 앱 변경은 현재 working tree 미커밋 상태로 보여 commit/push 연결은 확인 필요.
+- **6/10 WO-73 결과**: root result.md에 게스트 작괘 기본화 핫픽스 결과가 기록됨. 인앱 브라우저 OAuth 차단 대응(isInAppBrowser, 외부 브라우저 안내), 게스트 작괘 통과, MBTI 선택화, 게스트 결과 후 로그인 CTA, authState/personalizationMode 측정 파라미터가 포함됨. Deploy ID 6a284af632cbdd9d71ff81f3. 2026-06-24에 해당 working tree diff를 결과서와 대조해 일치 확인 후 `5940503 fix(WO-73): guest cast + in-app OAuth guard (deploy 6a284af)`로 commit/push 완료. 재배포 없음.
 - **6/14 하네스 작업**: _operations mirror, WO 마무리 표준, RAW 최신성 규칙만 갱신했고 본업 STATE는 갱신하지 않았음. 이번 누락의 직접 원인으로 기록.
 
 ### 확인 필요
 - `gwae_v0_cast_01` 광고가 2026-06-09 19:00~2026-06-11 19:00 집행 완료됐다는 사실은 WO 배경에는 있으나, 로컬 git/result 검색에서는 직접 근거를 찾지 못함. Meta/GA4 외부 콘솔 확인 필요.
-- WO-73 Deploy ID와 현재 미커밋 앱 diff의 관계 확인 필요. result에는 배포 완료가 적혀 있으나, git에는 WO-73 커밋이 없음.
+- WO-73 Deploy ID와 git 연결은 `5940503`으로 해소됨. AP-2 코어 diff=0, secret-guard PASS, private push 완료.
 - 광고 성과 숫자, GA4 DebugView/Key Event 상태, Meta Pixel ID/WO-70 진행 여부는 로컬에서 확인 불가.
 
 ### Open Follow-ups
 - [ ] GA4 G-YVVF39PZ2E Key Event 등록: cube_cast_complete, share_complete.
 - [ ] GA4 커스텀 측정기준 등록: appVersion, castId, readingMode, fallbackReason, temperamentGroup, interpretationVersion, utm_content, authState, personalizationMode.
 - [ ] Meta 광고관리자/GA4 콘솔에서 `gwae_v0_cast_01` 집행 기간·성과 확인.
-- [ ] WO-73 working tree 변경분 commit/push/배포 상태 정리.
+- [x] WO-73 working tree 변경분 commit/push/배포 상태 정리. `5940503` pushed, 재배포 없음.
 - [ ] WO-70 Pixel: Pixel ID 확보 후 동의·sanitizer 재사용해 추가 여부 결정.
 
 ### Context for Next Session
-이제 클로는 6/7 출시 직전 상태가 아니라 6/9 측정 구축과 6/10 인앱 핫픽스까지 반영된 STATE를 읽어야 한다. 다만 광고 성과와 WO-73 git 정리는 아직 외부 콘솔/커밋 확인이 필요하다. 이후 세션은 "광고 후 데이터 판정"으로 가기 전에 GA4/Meta 콘솔 사실과 WO-73 코드 상태를 먼저 닫는 것이 좋다.
+이제 클로는 6/7 출시 직전 상태가 아니라 6/9 측정 구축과 6/10 인앱 핫픽스까지 반영된 STATE를 읽어야 한다. WO-73 git 정리는 `5940503`으로 닫혔다. 이후 세션은 "광고 후 데이터 판정"으로 가기 전에 GA4/Meta 콘솔 사실을 확인하는 것이 좋다.
 
 
 ## 2026-06-07 — 큐브 앱 구현·배포 + V0 출시 게이트 통과
