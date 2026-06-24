@@ -2,7 +2,7 @@
 updated: 2026-06-24 KST (6/9 이후 본업 진행 재동기화 — git/result 기반)
 
 ## repo_state
-- branch: main / origin/main at 26d934d (handoff: record RAW freshness result)
+- branch: main / origin/main (STATE/HANDOFF resync pushed 2026-06-24)
 - working tree: dirty — 앱 파일 3개(index.html, analytics.js, main.js)와 root result.md 수정, local mirror/클로콘/result_v4 계열 untracked 확인. 앱 수정분은 WO-73 결과와 일치하나 git commit 여부는 확인 필요.
 - GitHub: yoorobo/gwae (SSH, private) / 미러: yoorobo/gwae-state (public)
 - 실사용 작괘 코어: src/divination/hexagramEngine.js + src/data/hexagrams.js + src/data/trigrams.js (AP-2 diff=0 확인)
